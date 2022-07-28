@@ -1,8 +1,8 @@
-import 'package:aloqa_nazorati/screens/appeals/appeal_page.dart';
+import 'package:aloqa_nazorati/screens/appeals/pages/appeal_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../home/home_page.dart';
+import '../home/pages/references/home_page.dart';
 import '../profile/profile_page.dart';
 
 class MainPage extends StatefulWidget {

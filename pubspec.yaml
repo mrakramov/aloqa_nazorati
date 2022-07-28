@@ -43,6 +43,7 @@ dependencies:
   flutter_bloc: ^8.0.1
   file_picker: ^4.5.1
   webview_flutter: ^3.0.4
+  url_launcher: ^6.1.2
 
 dev_dependencies:
   flutter_test:
@@ -70,6 +71,7 @@ flutter:
 
   assets:
      - assets/
+     - assets/images/
      - assets/icons/
 
 
