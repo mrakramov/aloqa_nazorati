@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
 import '../../../../utils/utils.dart';
@@ -10,8 +9,7 @@ import '../../../../utils/utils.dart';
 class HttpClientAuth {
   HttpClientAuth._privateConstructor();
 
-  static final HttpClientAuth _instance =
-      HttpClientAuth._privateConstructor();
+  static final HttpClientAuth _instance = HttpClientAuth._privateConstructor();
 
   factory HttpClientAuth() {
     return _instance;
@@ -20,9 +18,11 @@ class HttpClientAuth {
   Future<dynamic> getRequest(String path) async {
     Response response;
     try {
-      response = await get(path, headers: {
-        "mobile-app-key": Strings.webApiKey,
-      },
+      response = await get(
+        Uri.tryParse(path)!,
+        headers: {
+          "mobile-app-key": Strings.webApiKey,
+        },
       );
       final statusCode = response.statusCode;
       if (statusCode >= 200 && statusCode < 299) {
@@ -42,5 +42,4 @@ class HttpClientAuth {
       throw ConnectionException();
     }
   }
-
 }

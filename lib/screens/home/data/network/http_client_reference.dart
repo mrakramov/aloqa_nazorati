@@ -2,8 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 
 import '../../../../utils/utils.dart';
 
@@ -18,9 +17,9 @@ class HttpClientReference {
   }
 
   Future<dynamic> getRequest(String path) async {
-    Response response;
+    http.Response response;
     try {
-      response = await get(path, headers: {
+      response = await http.get(Uri.tryParse(path)!, headers: {
         "mobile-app-key": Strings.webApiKey,
       });
       final statusCode = response.statusCode;
@@ -41,5 +40,4 @@ class HttpClientReference {
       throw ConnectionException();
     }
   }
-
 }

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
 import '../../../../utils/utils.dart';
@@ -17,13 +16,15 @@ class HttpClientAppeal {
     return _instance;
   }
 
-  Future<dynamic> getRequest(String path,String token) async {
+  Future<dynamic> getRequest(String path, String token) async {
     Response response;
     try {
-      response = await get(path, headers: {
-        "mobile-app-key": Strings.webApiKey,
-        "Authorization": "Bearer $token"
-      },
+      response = await get(
+        Uri.tryParse(path)!,
+        headers: {
+          "mobile-app-key": Strings.webApiKey,
+          "Authorization": "Bearer $token"
+        },
       );
       final statusCode = response.statusCode;
       if (statusCode >= 200 && statusCode < 299) {
@@ -43,5 +44,4 @@ class HttpClientAppeal {
       throw ConnectionException();
     }
   }
-
 }
