@@ -1,4 +1,5 @@
 import 'package:aloqa_nazorati/screens/home/data/model/reference_list_response.dart';
+import 'package:aloqa_nazorati/screens/home/pages/reference_send/page/reference_send_view.dart';
 import 'package:aloqa_nazorati/screens/home/pages/reference_list/bloc/reference_list_bloc.dart';
 import 'package:aloqa_nazorati/screens/home/pages/reference_list/bloc/reference_list_state.dart';
 import 'package:aloqa_nazorati/utils/utils.dart';
@@ -81,11 +82,15 @@ class _ReferenceListPageState extends State<ReferenceListPage> {
         ),
         Expanded(
             child: ListView.separated(
+          shrinkWrap: true,
           physics: const BouncingScrollPhysics(),
           itemCount: response.length,
           itemBuilder: (context, index) {
             return ListTile(
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const ReferenceSendPage()));
+              },
               title: Text(response[index].name.uz,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         color: Colors.black,
