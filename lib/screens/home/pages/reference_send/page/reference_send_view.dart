@@ -128,7 +128,7 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
                     onPressed: () {},
                     icon: const Icon(Icons.location_city),
                     label: const Text("Lokatsiyani belgilash")),
-              )
+              ),
             ],
           ),
         ),
