@@ -40,4 +40,30 @@ class HttpClientReference {
       throw ConnectionException();
     }
   }
+
+  Future<dynamic> postRequest(
+      {required String? path, required Map<String, dynamic> body}) async {
+    http.Response response;
+    try {
+      response = await http.post(Uri.tryParse(path!)!, body: body, headers: {
+        "mobile-app-key": Strings.webApiKey,
+      });
+      final statusCode = response.statusCode;
+      if (statusCode >= 200 && statusCode < 299) {
+        if (response.body.isEmpty) {
+          return <dynamic>[];
+        } else {
+          return jsonDecode(response.body);
+        }
+      } else if (statusCode >= 400 && statusCode < 500) {
+        throw ClientErrorException();
+      } else if (statusCode >= 500 && statusCode < 600) {
+        throw ServerErrorException();
+      } else {
+        throw UnknownException();
+      }
+    } on SocketException {
+      throw ConnectionException();
+    }
+  }
 }
