@@ -1,30 +1,66 @@
 import 'package:aloqa_nazorati/screens/appeals/data/model/AppealResponse.dart';
+import 'package:aloqa_nazorati/screens/appeals/data/model/regions_response_model.dart';
+import 'package:aloqa_nazorati/screens/appeals/data/model/districts_response_model.dart';
+import 'package:aloqa_nazorati/screens/appeals/data/model/single_appeal_response.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/network/http_client_appeal.dart';
 import 'package:aloqa_nazorati/screens/appeals/domain/appeal_repo.dart';
-import 'package:aloqa_nazorati/screens/auth/data/model/UserDataResponse.dart';
-import 'package:aloqa_nazorati/screens/auth/data/network/http_client_auth.dart';
-import 'package:aloqa_nazorati/screens/auth/domain/auth_repo.dart';
-import 'package:aloqa_nazorati/screens/home/data/model/reference_list_response.dart';
-import 'package:aloqa_nazorati/screens/home/data/network/http_client_reference.dart';
-import 'package:aloqa_nazorati/screens/home/domain/reference_repo.dart';
+import 'package:aloqa_nazorati/screens/appeals/data/model/reference_send_model.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../../utils/utils.dart';
 
+typedef Func = String? Function(int? regionId);
+
 class _Urls {
   static const baseUrl = "https://xn.technocorp.uz/api/";
   static const appeals = "${baseUrl}my-tickets";
+  static const referenceSending = "${baseUrl}create-ticket";
+  static const regions = '${baseUrl}regions';
+  static Func districts = (int? regionId) => '$baseUrl/$regionId/districts';
 }
 
 class AppealRepository extends AppealRepo {
   final HttpClientAppeal _httpClient = HttpClientAppeal();
 
   @override
-  Future<AppealResponse> appeals(String token) async{
+  Future<AppealResponse> appeals(String token) async {
     try {
       final Map<String, dynamic> response =
-          await _httpClient.getRequest(_Urls.appeals,token);
+          await _httpClient.getRequest(_Urls.appeals, token, true);
       return AppealResponse.fromJson(response);
+    } catch (e) {
+      throw ApiExceptionMapper.toErrorMessage(e);
+    }
+  }
+
+  @override
+  Future<AppealCreateResponse> referencesSendingMethod(
+      {required ReferenceSendModel? model, required String? token}) async {
+    try {
+      final response = await _httpClient.postRequest(
+          path: _Urls.referenceSending, body: model!.toJson, token: token);
+      if (kDebugMode) {
+        print(response['code']);
+      }
+
+      return AppealCreateResponse.fromJson(response);
+    } catch (e) {
+      throw ApiExceptionMapper.toErrorMessage(e);
+    }
+  }
+
+  @override
+  Future<List<DistrictsResponse>> getDistricts(int? regionId) {
+    // TODO: implement getDistricts
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<RegionsResponse>> getRegions() async {
+    try {
+      List response = await _httpClient.getRequest(_Urls.regions, '', false);
+      response = response.map((e) => RegionsResponse.fromJson(e)).toList();
+      return response.cast<RegionsResponse>();
     } catch (e) {
       throw ApiExceptionMapper.toErrorMessage(e);
     }

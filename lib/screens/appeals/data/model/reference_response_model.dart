@@ -13,10 +13,10 @@ class ReferenceResponseModel {
   String? code;
   String? userType;
   String? source;
-  String? sentAt;
+  DateTime? sentAt;
   int? userId;
-  String? updatedAt;
-  String? createdAt;
+  DateTime? updatedAt;
+  DateTime? createdAt;
   int? id;
 
   ReferenceResponseModel.fromJson(Map<String, dynamic> json) {
@@ -34,10 +34,10 @@ class ReferenceResponseModel {
     code = json['code'];
     userType = json['user_type'];
     source = json['source'];
-    sentAt = json['sent_at'];
+    sentAt = DateTime.tryParse(json['sent_at']);
     userId = json['user_id'];
-    updatedAt = json['updated_at'];
-    createdAt = json['created_at'];
+    updatedAt = DateTime.tryParse(json['updated_at']);
+    createdAt = DateTime.tryParse(json['created_at']);
     id = json['id'];
   }
 
@@ -57,10 +57,10 @@ class ReferenceResponseModel {
       'code': code,
       'user_type': userType,
       'source': source,
-      'sent_at': sentAt,
+      'sent_at': sentAt!.toIso8601String(),
       'user_id': userId,
-      'updated_at': updatedAt,
-      'created_at': createdAt,
+      'updated_at': updatedAt!.toIso8601String(),
+      'created_at': createdAt!.toIso8601String(),
       'id': id,
     };
   }

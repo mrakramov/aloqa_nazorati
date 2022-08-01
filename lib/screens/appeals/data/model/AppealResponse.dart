@@ -211,8 +211,7 @@ class Datum {
         senderId: json["sender_id"],
         receiverId: json["receiver_id"],
         isSend: json["is_send"],
-        sentAt:
-            json["sent_at"] = DateTime.parse(json["sent_at"]),
+        sentAt: json["sent_at"] = DateTime.parse(json["sent_at"]),
         createdAt: json["created_at"] = DateTime.parse(json["created_at"]),
         updatedAt: json["updated_at"] = DateTime.parse(json["updated_at"]),
         extraPhone: json["extra_phone"],
@@ -223,10 +222,14 @@ class Datum {
         extraCode: json["extra_code"],
         userId: json["user_id"],
         status: json["status"],
-        ticketRegion: json["ticket_region"] = Reference.fromJson(json["ticket_region"]),
-        ticketDistrict: json["ticket_district"] = Reference.fromJson(json["ticket_district"]),
-        responseLetter: json["response_letter"] = ResponseLetter.fromJson(json["response_letter"]),
-        referenceParent: json["reference_parent"] = Reference.fromJson(json["reference_parent"]),
+        ticketRegion: json["ticket_region"] =
+            Reference.fromJson(json["ticket_region"]),
+        ticketDistrict: json["ticket_district"] =
+            Reference.fromJson(json["ticket_district"]),
+        responseLetter: json["response_letter"] =
+            ResponseLetter.fromJson(json["response_letter"]),
+        referenceParent: json["reference_parent"] =
+            Reference.fromJson(json["reference_parent"]),
         reference: json["reference"] = Reference.fromJson(json["reference"]),
       );
 
@@ -292,8 +295,7 @@ class Reference {
 
   factory Reference.fromJson(Map<String, dynamic> json) => Reference(
         id: json["id"],
-        name:
-            json["name"] = ReferenceName.fromJson(json["name"]),
+        name: json["name"] = ReferenceName.fromJson(json["name"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -343,8 +345,7 @@ class ReferenceName {
       };
 }
 
-class
-ResponseLetter {
+class ResponseLetter {
   ResponseLetter({
     required this.id,
     required this.name,
