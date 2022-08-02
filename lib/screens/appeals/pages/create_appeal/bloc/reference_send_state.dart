@@ -1,3 +1,4 @@
+import 'package:aloqa_nazorati/screens/appeals/data/model/districts_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/regions_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/single_appeal_response.dart';
 
@@ -7,6 +8,11 @@ abstract class ReferenceSendState {
 
 class InitialState extends ReferenceSendState {
   InitialState();
+}
+
+class DistrictSuccessState extends ReferenceSendState {
+  List<DistrictsResponse> districts;
+  DistrictSuccessState(this.districts);
 }
 
 class RegionsSuccessState extends ReferenceSendState {
@@ -31,6 +37,6 @@ class LoadingState extends ReferenceSendState {
 }
 
 class ErrorState extends ReferenceSendState {
-  String? errMsg;
-  ErrorState(this.errMsg);
+  dynamic error;
+  ErrorState(this.error);
 }

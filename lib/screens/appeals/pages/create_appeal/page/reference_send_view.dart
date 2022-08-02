@@ -1,7 +1,6 @@
 import 'package:aloqa_nazorati/screens/appeals/data/network/appeal_repository.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/reference_send_cubit.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/reference_send_state.dart';
-import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/address_text_field.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/custom_button.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/custom_form_field.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/file_add_button.dart';
@@ -9,7 +8,6 @@ import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/l
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/optional_text.dart';
 import 'package:aloqa_nazorati/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,13 +28,18 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
   final ReferenceSendCubit _cubit = ReferenceSendCubit(AppealRepository());
   Size? _size;
   final key = GlobalKey<FormState>();
-  int? regionId = -1;
+  late int? regionId;
+  late int? districtId;
+  String? hintText = 'Viloyatni tanlang';
+  String? hintTextDistrict = "Tumanni tanlang";
 
   TextEditingController? murojatController = TextEditingController();
   TextEditingController? addressController = TextEditingController();
   @override
   void initState() {
     _cubit.getRegions();
+    regionId = 1;
+    districtId = 130;
     super.initState();
   }
 
@@ -105,62 +108,62 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
                 // bloc: _cubit,
                 builder: (context, state) {
               if (state is RegionsSuccessState && state.regions.isNotEmpty) {
-                if (kDebugMode) {
-                  for (var element in state.regions) {
-                    print(element.id);
-                  }
+                List<DropdownMenuItem<int>> data = [];
+                for (var item in state.regions) {
+                  data.add(DropdownMenuItem(
+                      value: item.id, child: Text(item.name!.oz!.toString())));
                 }
-                return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: state.regions.length,
-                    itemBuilder: (context, index) => Card(
-                          child: ListTile(
-                              title: Text(
-                                  state.regions[index].name!.uz.toString())),
-                        ));
-                // return Padding(
-                //   padding: const EdgeInsets.symmetric(horizontal: 15),
-                //   child: TextField(
-                //     decoration: InputDecoration(
-                //         isDense: true,
-                //         floatingLabelBehavior: FloatingLabelBehavior.auto,
-                //         labelText: 'Viloyatni tanlang',
-                //         focusColor: ColorsUtils.myColor,
-                //         floatingLabelStyle:
-                //             const TextStyle(color: ColorsUtils.myColor),
-                //         focusedBorder: const OutlineInputBorder(
-                //             borderSide: BorderSide(
-                //           color: ColorsUtils.myColor,
-                //         )),
-                //         border: const OutlineInputBorder(
-                //             borderSide: BorderSide(
-                //           color: ColorsUtils.myColor,
-                //         )),
-                //         suffixIcon: const Icon(
-                //           Icons.expand_more_outlined,
-                //           color: Colors.grey,
-                //         ),
-                //         prefix: DropdownButton<int?>(
-                //             isExpanded: true,
-                //             value: regionId!,
-                //             isDense: true,
-                //             icon: const SizedBox.shrink(),
-                //             underline: const SizedBox.shrink(),
-                //             items: [
-                //               for (var i = 0; i < state.regions.length; i++)
-                //                 DropdownMenuItem(
-                //                     value: i,
-                //                     child: Text(
-                //                         state.regions[i].name!.uz!.toString())),
-                //             ],
-                //             onChanged: (value) {
-                //               regionId = value!;
-                //               setState(() {});
-                //             })),
-                //   ),
-                // );
 
+                if (state.regions.isEmpty) {
+                  return const CupertinoActivityIndicator();
+                }
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: TextField(
+                    decoration: InputDecoration(
+                        isDense: true,
+                        filled: false,
+                        enabled: true,
+                        floatingLabelBehavior: FloatingLabelBehavior.auto,
+                        labelText: hintText,
+                        // hintText: hintText,
+                        hintStyle: const TextStyle(color: ColorsUtils.myColor),
+                        focusColor: ColorsUtils.myColor,
+                        floatingLabelStyle:
+                            const TextStyle(color: ColorsUtils.myColor),
+                        focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                          color: ColorsUtils.myColor,
+                        )),
+                        border: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                          color: ColorsUtils.myColor,
+                        )),
+                        // contentPadding: EdgeInsets.zero,
+                        suffixIcon: const Icon(
+                          Icons.expand_more_outlined,
+                          color: Colors.grey,
+                        ),
+                        prefixStyle:
+                            const TextStyle(color: ColorsUtils.myColor),
+                        prefix: DropdownButton<int?>(
+                            isExpanded: true,
+                            value: regionId!,
+                            isDense: true,
+                            icon: const SizedBox.shrink(),
+                            underline: const SizedBox.shrink(),
+                            items: data,
+                            onChanged: (value) {
+                              regionId = value!;
+                              hintText = state.regions
+                                  .singleWhere(
+                                      (element) => element.id == regionId)
+                                  .name!
+                                  .uz;
+                              setState(() {});
+                            })),
+                  ),
+                );
               }
               return const Center(
                 child: CupertinoActivityIndicator(),
@@ -170,24 +173,92 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
             const SizedBox(
               height: 15,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: AddressTextField(
-                controller: addressController!,
-                labelText: 'Viloyatni tanlang',
-              ),
-            ),
+
+            BlocBuilder<ReferenceSendCubit, ReferenceSendState>(
+                // bloc: _cubit,
+                builder: (context, state) {
+              if (state is DistrictSuccessState && state.districts.isNotEmpty) {
+                List<DropdownMenuItem<int>> data = [];
+                for (var item in state.districts) {
+                  data.add(DropdownMenuItem(
+                      value: item.id, child: Text(item.name!.oz!.toString())));
+                }
+
+                if (state.districts.isEmpty) {
+                  return const CupertinoActivityIndicator();
+                }
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: TextField(
+                    decoration: InputDecoration(
+                        isDense: true,
+                        filled: false,
+                        enabled: true,
+                        floatingLabelBehavior: FloatingLabelBehavior.auto,
+                        labelText: hintTextDistrict,
+                        // hintText: hintText,
+                        hintStyle: const TextStyle(color: ColorsUtils.myColor),
+                        focusColor: ColorsUtils.myColor,
+                        floatingLabelStyle:
+                            const TextStyle(color: ColorsUtils.myColor),
+                        focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                          color: ColorsUtils.myColor,
+                        )),
+                        border: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                          color: ColorsUtils.myColor,
+                        )),
+                        // contentPadding: EdgeInsets.zero,
+                        suffixIcon: const Icon(
+                          Icons.expand_more_outlined,
+                          color: Colors.grey,
+                        ),
+                        prefixStyle:
+                            const TextStyle(color: ColorsUtils.myColor),
+                        prefix: DropdownButton<int?>(
+                            isExpanded: true,
+                            value: regionId!,
+                            isDense: true,
+                            icon: const SizedBox.shrink(),
+                            underline: const SizedBox.shrink(),
+                            items: data,
+                            onChanged: (value) {
+                              districtId = value!;
+                              hintTextDistrict = state.districts
+                                  .singleWhere(
+                                      (element) => element.id == districtId)
+                                  .name!
+                                  .uz;
+                              setState(() {});
+                            })),
+                  ),
+                );
+              }
+              return const Center(
+                child: CupertinoActivityIndicator(),
+              );
+            }),
+
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 15),
+            //   child: DistrictTextField(
+            //     controller: TextEditingController(),
+            //     labelText: 'Tumanni tanlang',
+            //   ),
+            // ),
 
             const SizedBox(
               height: 15,
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
               child: TextField(
-                decoration: InputDecoration(
+                controller: addressController,
+                decoration: const InputDecoration(
                     // hintText: 'Manzilni kiriting',
                     labelText: 'Manzilni kiriting',
-                    floatingLabelBehavior: FloatingLabelBehavior.auto,
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
                     border: OutlineInputBorder()),
               ),
             ),

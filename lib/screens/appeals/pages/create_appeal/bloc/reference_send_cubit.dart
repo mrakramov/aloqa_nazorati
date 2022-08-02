@@ -14,18 +14,35 @@ class ReferenceSendCubit extends Cubit<ReferenceSendState> {
     try {
       emit(LoadingState(true));
       final response = await repository.getRegions();
-      // if (kDebugMode) {
-      //   response.first.name!.uz;
-      // }
+      if (kDebugMode) {
+        // for (var element in response) {
+        //   print(element.id);
+        // }
+      }
       if (response.isNotEmpty) {
         emit(LoadingState(false));
         emit(RegionsSuccessState(response));
       } else {
         emit(LoadingState(false));
-        emit(ErrorState(response.toString()));
+        emit(ErrorState(response));
       }
     } catch (e) {
-      emit(ErrorState(e.toString()));
+      emit(ErrorState(e));
+    }
+  }
+
+  void getDistricts(int? regionId) async {
+    try {
+      emit(LoadingState(true));
+      final districtResponse = await repository.getDistricts(regionId);
+      if (districtResponse.isNotEmpty) {
+        emit(LoadingState(false));
+        emit(DistrictSuccessState(districtResponse));
+      }
+      emit(LoadingState(false));
+      emit(ErrorState(districtResponse));
+    } catch (e) {
+      emit(ErrorState(e));
     }
   }
 

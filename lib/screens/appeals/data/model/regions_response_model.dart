@@ -1,4 +1,6 @@
-class RegionsResponse {
+import 'package:equatable/equatable.dart';
+
+class RegionsResponse extends Equatable {
   int? id;
   Name? name;
   bool? isActive;
@@ -12,17 +14,17 @@ class RegionsResponse {
   String? enAddressLetter;
 
   RegionsResponse(
-      {this.id,
-      this.name,
-      this.isActive,
-      this.parentId,
-      this.createdAt,
-      this.updatedAt,
-      this.isRepublic,
-      this.uzTextLetter,
-      this.enTextLetter,
-      this.uzAddressLetter,
-      this.enAddressLetter});
+      {required this.id,
+      required this.name,
+      required this.isActive,
+      required this.parentId,
+      required this.createdAt,
+      required this.updatedAt,
+      required this.isRepublic,
+      required this.uzTextLetter,
+      required this.enTextLetter,
+      required this.uzAddressLetter,
+      required this.enAddressLetter});
 
   RegionsResponse.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -55,9 +57,15 @@ class RegionsResponse {
     data['en_address_letter'] = enAddressLetter;
     return data;
   }
+
+  @override
+  List<Object?> get props => [
+        id,
+        name,
+      ];
 }
 
-class Name {
+class Name extends Equatable {
   String? oz;
   String? uz;
   String? ru;
@@ -77,4 +85,7 @@ class Name {
     data['ru'] = ru;
     return data;
   }
+
+  @override
+  List<Object?> get props => [uz, ru, oz];
 }

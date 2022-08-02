@@ -1,4 +1,6 @@
-class DistrictsResponse {
+import 'package:equatable/equatable.dart';
+
+class DistrictsResponse extends Equatable {
   int? id;
   Name? name;
   bool? isActive;
@@ -55,9 +57,12 @@ class DistrictsResponse {
     data['en_address_letter'] = enAddressLetter;
     return data;
   }
+
+  @override
+  List<Object?> get props => [id, name];
 }
 
-class Name {
+class Name extends Equatable {
   String? ru;
   String? en;
   String? uz;
@@ -80,4 +85,7 @@ class Name {
     data['oz'] = oz;
     return data;
   }
+
+  @override
+  List<Object?> get props => [ru, oz, uz];
 }

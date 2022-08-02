@@ -47,6 +47,7 @@ dependencies:
   font_awesome_flutter: ^10.1.0
   freezed_annotation: ^0.12.0
   fluttertoast: ^8.0.9
+  equatable: ^2.0.3
   
 
 dev_dependencies:

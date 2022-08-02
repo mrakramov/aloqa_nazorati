@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class AddressTextField extends StatelessWidget {
-  const AddressTextField({
+class DistrictTextField extends StatelessWidget {
+  const DistrictTextField({
     super.key,
     required this.controller,
     required this.labelText,
@@ -14,7 +14,7 @@ class AddressTextField extends StatelessWidget {
       controller: controller,
       decoration: InputDecoration(
         isDense: true,
-        floatingLabelBehavior: FloatingLabelBehavior.auto,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
         labelText: labelText!,
         border: const OutlineInputBorder(),
         suffixIcon: const Icon(
