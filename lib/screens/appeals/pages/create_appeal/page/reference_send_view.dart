@@ -13,9 +13,10 @@ import 'package:aloqa_nazorati/utils/db/hive_db.dart';
 import 'package:aloqa_nazorati/utils/di/locator.dart';
 import 'package:aloqa_nazorati/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class ReferenceSendPage extends StatefulWidget {
   final int? reference_parent_id;
@@ -43,6 +44,9 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
   TextEditingController? addressController = TextEditingController();
   @override
   void initState() {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
+    }
     regionId = 1;
     districtId = 1;
     _cubit.getDistricts(regionId);
@@ -110,6 +114,8 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
   Widget getBody() {
     return SafeArea(
       child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics()),
         child: Column(
           children: [
             Padding(
