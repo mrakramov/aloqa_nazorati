@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+// ignore: must_be_immutable
 class DistrictsResponse extends Equatable {
   int? id;
   Name? name;
@@ -59,7 +60,7 @@ class DistrictsResponse extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name];
+  List<Object?> get props => [id, name, parentId];
 }
 
 class Name extends Equatable {

@@ -16,7 +16,9 @@ class _Urls {
   static const appeals = "${baseUrl}my-tickets";
   static const referenceSending = "${baseUrl}create-ticket";
   static const regions = '${baseUrl}regions';
-  static Func districts = (int? regionId) => '$baseUrl/region/10/districts';
+  static String? districts(int? regionId) {
+    return '${baseUrl}region/$regionId/districts';
+  }
 }
 
 class AppealRepository extends AppealRepo {
@@ -52,7 +54,7 @@ class AppealRepository extends AppealRepo {
   @override
   Future<List<DistrictsResponse>> getDistricts(int? regionId) async {
     try {
-      String? districtUrl = _Urls.districts(10)!;
+      String? districtUrl = _Urls.districts(regionId)!;
       List response = await _httpClient.getRequest(districtUrl, '', false);
       response = response.map((e) => DistrictsResponse.fromJson(e)).toList();
       return response.cast<DistrictsResponse>();

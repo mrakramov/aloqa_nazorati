@@ -12,7 +12,8 @@ class InitialState extends ReferenceSendState {
 
 class DistrictSuccessState extends ReferenceSendState {
   List<DistrictsResponse> districts;
-  DistrictSuccessState(this.districts);
+  DistrictsResponse? currentDistrict;
+  DistrictSuccessState(this.districts, this.currentDistrict);
 }
 
 class RegionsSuccessState extends ReferenceSendState {

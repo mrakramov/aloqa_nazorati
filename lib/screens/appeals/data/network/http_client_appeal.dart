@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
 import '../../../../utils/utils.dart';
@@ -19,6 +20,9 @@ class HttpClientAppeal {
   Future<dynamic> getRequest(
       String path, String token, bool? shouldToken) async {
     Response response;
+    if (kDebugMode) {
+      print(path);
+    }
     try {
       response = await get(
         Uri.tryParse(path)!,

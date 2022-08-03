@@ -106,75 +106,72 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
             ),
             BlocBuilder<ReferenceSendCubit, ReferenceSendState>(
                 // bloc: _cubit,
-                buildWhen: (previous, current) =>
-                    current is! DistrictSuccessState,
+                // buildWhen: (previous, current) =>
+                //     current is! DistrictSuccessState,
                 builder: (context, state) {
-                  if (state is RegionsSuccessState &&
-                      state.regions.isNotEmpty) {
-                    List<DropdownMenuItem<int>> data = [];
-                    for (var item in state.regions) {
-                      data.add(DropdownMenuItem(
-                          value: item.id,
-                          child: Text(item.name!.oz!.toString())));
-                    }
+              List<DropdownMenuItem<int>> data = [];
+              if (state is RegionsSuccessState && state.regions.isNotEmpty) {
+                data.clear();
+                for (var item in state.regions) {
+                  data.add(DropdownMenuItem(
+                      value: item.id, child: Text(item.name!.oz!.toString())));
+                }
 
-                    if (state.regions.isEmpty) {
-                      return const CupertinoActivityIndicator();
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: TextField(
-                        decoration: InputDecoration(
+                if (state.regions.isEmpty) {
+                  return const Center(child: CupertinoActivityIndicator());
+                }
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: TextField(
+                    decoration: InputDecoration(
+                        isDense: true,
+                        filled: false,
+                        enabled: true,
+                        floatingLabelBehavior: FloatingLabelBehavior.auto,
+                        labelText: hintText,
+                        // hintText: hintText,
+                        hintStyle: const TextStyle(color: ColorsUtils.myColor),
+                        focusColor: ColorsUtils.myColor,
+                        floatingLabelStyle:
+                            const TextStyle(color: ColorsUtils.myColor),
+                        focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                          color: ColorsUtils.myColor,
+                        )),
+                        border: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                          color: ColorsUtils.myColor,
+                        )),
+                        // contentPadding: EdgeInsets.zero,
+                        suffixIcon: const Icon(
+                          Icons.expand_more_outlined,
+                          color: Colors.grey,
+                        ),
+                        prefixStyle:
+                            const TextStyle(color: ColorsUtils.myColor),
+                        prefix: DropdownButton<int?>(
+                            isExpanded: true,
+                            value: regionId!,
                             isDense: true,
-                            filled: false,
-                            enabled: true,
-                            floatingLabelBehavior: FloatingLabelBehavior.auto,
-                            labelText: hintText,
-                            // hintText: hintText,
-                            hintStyle:
-                                const TextStyle(color: ColorsUtils.myColor),
-                            focusColor: ColorsUtils.myColor,
-                            floatingLabelStyle:
-                                const TextStyle(color: ColorsUtils.myColor),
-                            focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(
-                              color: ColorsUtils.myColor,
-                            )),
-                            border: const OutlineInputBorder(
-                                borderSide: BorderSide(
-                              color: ColorsUtils.myColor,
-                            )),
-                            // contentPadding: EdgeInsets.zero,
-                            suffixIcon: const Icon(
-                              Icons.expand_more_outlined,
-                              color: Colors.grey,
-                            ),
-                            prefixStyle:
-                                const TextStyle(color: ColorsUtils.myColor),
-                            prefix: DropdownButton<int?>(
-                                isExpanded: true,
-                                value: regionId!,
-                                isDense: true,
-                                icon: const SizedBox.shrink(),
-                                underline: const SizedBox.shrink(),
-                                items: data,
-                                onChanged: (value) {
-                                  regionId = value!;
-                                  hintText = state.regions
-                                      .singleWhere(
-                                          (element) => element.id == regionId)
-                                      .name!
-                                      .uz;
-                                  _cubit.getDistricts(regionId);
-                                  setState(() {});
-                                })),
-                      ),
-                    );
-                  }
-                  return const Center(
-                    child: CupertinoActivityIndicator(),
-                  );
-                }),
+                            icon: const SizedBox.shrink(),
+                            underline: const SizedBox.shrink(),
+                            items: data,
+                            onChanged: (value) {
+                              regionId = value!;
+                              hintText = state.regions
+                                  .singleWhere(
+                                      (element) => element.id == regionId)
+                                  .name!
+                                  .uz;
+                              _cubit.getDistricts(regionId);
+                            })),
+                  ),
+                );
+              }
+              return const Center(
+                child: CupertinoActivityIndicator(),
+              );
+            }),
 
             const SizedBox(
               height: 15,
@@ -184,6 +181,7 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
                 // bloc: _cubit,
                 builder: (context, state) {
               if (state is DistrictSuccessState && state.districts.isNotEmpty) {
+                districtId = state.currentDistrict!.id;
                 List<DropdownMenuItem<int>> data = [];
                 for (var item in state.districts) {
                   data.add(DropdownMenuItem(
@@ -224,7 +222,7 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
                             const TextStyle(color: ColorsUtils.myColor),
                         prefix: DropdownButton<int?>(
                             isExpanded: true,
-                            value: regionId!,
+                            value: districtId!,
                             isDense: true,
                             icon: const SizedBox.shrink(),
                             underline: const SizedBox.shrink(),
