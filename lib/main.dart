@@ -1,8 +1,10 @@
 import 'package:aloqa_nazorati/screens/auth/pages/id_page.dart';
+import 'package:aloqa_nazorati/utils/di/locator.dart';
 import 'package:flutter/material.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  setup();
   runApp(const MyApp());
 }
 

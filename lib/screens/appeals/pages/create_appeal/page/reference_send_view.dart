@@ -1,3 +1,5 @@
+import 'package:aloqa_nazorati/screens/appeals/data/model/districts_response_model.dart';
+import 'package:aloqa_nazorati/screens/appeals/data/model/regions_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/network/appeal_repository.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/reference_send_cubit.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/reference_send_state.dart';
@@ -6,6 +8,8 @@ import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/c
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/file_add_button.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/location_button.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/optional_text.dart';
+import 'package:aloqa_nazorati/utils/db/hive_db.dart';
+import 'package:aloqa_nazorati/utils/di/locator.dart';
 import 'package:aloqa_nazorati/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -30,6 +34,7 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
   final key = GlobalKey<FormState>();
   late int? regionId;
   late int? districtId;
+  late DistrictsResponse? selectedDistrict;
   String? hintText = 'Viloyatni tanlang';
   String? hintTextDistrict = "Tumanni tanlang";
 
@@ -37,9 +42,9 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
   TextEditingController? addressController = TextEditingController();
   @override
   void initState() {
-    _cubit.getRegions();
     regionId = 1;
-    districtId = 130;
+    districtId = 1;
+    _cubit.getDistricts(regionId);
     super.initState();
   }
 
@@ -104,74 +109,87 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
             const SizedBox(
               height: 15,
             ),
-            BlocBuilder<ReferenceSendCubit, ReferenceSendState>(
-                // bloc: _cubit,
-                // buildWhen: (previous, current) =>
-                //     current is! DistrictSuccessState,
-                builder: (context, state) {
-              List<DropdownMenuItem<int>> data = [];
-              if (state is RegionsSuccessState && state.regions.isNotEmpty) {
-                data.clear();
-                for (var item in state.regions) {
-                  data.add(DropdownMenuItem(
-                      value: item.id, child: Text(item.name!.oz!.toString())));
-                }
+            FutureBuilder<List<Map<String, dynamic>>>(
+                future: Future(() => serviceLocator
+                    .get<HiveDB>()
+                    .box
+                    .get(Strings.regionsDataKey)),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return const Center(
+                      child: CupertinoActivityIndicator(),
+                    );
+                  }
 
-                if (state.regions.isEmpty) {
-                  return const Center(child: CupertinoActivityIndicator());
-                }
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: TextField(
-                    decoration: InputDecoration(
-                        isDense: true,
-                        filled: false,
-                        enabled: true,
-                        floatingLabelBehavior: FloatingLabelBehavior.auto,
-                        labelText: hintText,
-                        // hintText: hintText,
-                        hintStyle: const TextStyle(color: ColorsUtils.myColor),
-                        focusColor: ColorsUtils.myColor,
-                        floatingLabelStyle:
-                            const TextStyle(color: ColorsUtils.myColor),
-                        focusedBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(
-                          color: ColorsUtils.myColor,
-                        )),
-                        border: const OutlineInputBorder(
-                            borderSide: BorderSide(
-                          color: ColorsUtils.myColor,
-                        )),
-                        // contentPadding: EdgeInsets.zero,
-                        suffixIcon: const Icon(
-                          Icons.expand_more_outlined,
-                          color: Colors.grey,
-                        ),
-                        prefixStyle:
-                            const TextStyle(color: ColorsUtils.myColor),
-                        prefix: DropdownButton<int?>(
-                            isExpanded: true,
-                            value: regionId!,
+                  List<DropdownMenuItem<int>> data = [];
+                  if (snapshot.data!.isNotEmpty) {
+                    List<RegionsResponse?>? dataResponse = snapshot.data!
+                        .map((e) => RegionsResponse.fromJson(e))
+                        .toList();
+                    data.clear();
+                    for (var item in dataResponse) {
+                      data.add(DropdownMenuItem(
+                          value: item!.id!,
+                          child: Text(item.name!.oz!.toString())));
+                    }
+
+                    if (dataResponse.isEmpty) {
+                      return const Center(child: CupertinoActivityIndicator());
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: TextField(
+                        decoration: InputDecoration(
                             isDense: true,
-                            icon: const SizedBox.shrink(),
-                            underline: const SizedBox.shrink(),
-                            items: data,
-                            onChanged: (value) {
-                              regionId = value!;
-                              hintText = state.regions
-                                  .singleWhere(
-                                      (element) => element.id == regionId)
-                                  .name!
-                                  .uz;
-                              _cubit.getDistricts(regionId);
-                            })),
-                  ),
-                );
-              }
-              return const Center(
-                child: CupertinoActivityIndicator(),
-              );
-            }),
+                            filled: false,
+                            enabled: true,
+                            floatingLabelBehavior: FloatingLabelBehavior.never,
+                            labelText: hintText,
+                            // hintText: hintText,
+                            hintStyle:
+                                const TextStyle(color: ColorsUtils.myColor),
+                            focusColor: ColorsUtils.myColor,
+                            floatingLabelStyle:
+                                const TextStyle(color: ColorsUtils.myColor),
+                            focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                              color: ColorsUtils.myColor,
+                            )),
+                            border: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                              color: ColorsUtils.myColor,
+                            )),
+                            // contentPadding: EdgeInsets.zero,
+                            suffixIcon: const Icon(
+                              Icons.expand_more_outlined,
+                              color: Colors.grey,
+                            ),
+                            prefixStyle:
+                                const TextStyle(color: ColorsUtils.myColor),
+                            prefix: DropdownButton<int?>(
+                                isExpanded: true,
+                                value: regionId!,
+                                isDense: true,
+                                icon: const SizedBox.shrink(),
+                                underline: const SizedBox.shrink(),
+                                items: data,
+                                onChanged: (value) {
+                                  regionId = value!;
+                                  hintText = dataResponse
+                                      .singleWhere(
+                                          (element) => element!.id == regionId)!
+                                      .name!
+                                      .uz;
+                                  _cubit.getDistricts(regionId);
+                                  setState(() {});
+                                })),
+                      ),
+                    );
+                  }
+                  return const Center(
+                    child: CupertinoActivityIndicator(),
+                  );
+                }),
 
             const SizedBox(
               height: 15,
@@ -198,7 +216,7 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
                         isDense: true,
                         filled: false,
                         enabled: true,
-                        floatingLabelBehavior: FloatingLabelBehavior.auto,
+                        floatingLabelBehavior: FloatingLabelBehavior.never,
                         labelText: hintTextDistrict,
                         // hintText: hintText,
                         hintStyle: const TextStyle(color: ColorsUtils.myColor),
@@ -234,6 +252,8 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
                                       (element) => element.id == districtId)
                                   .name!
                                   .uz;
+                              selectedDistrict = state.districts.singleWhere(
+                                  (element) => element.id == districtId);
                               setState(() {});
                             })),
                   ),

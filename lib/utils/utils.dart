@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Strings {
+  static const dbBoxName = 'region_db';
+  static const regionsDataKey = 'regions_data';
   static const connectionError = "Internet bilan uzulish mavjud !";
   static const clientError = "Ma'lumotlar topilmadi !";
   static const serverError = "Server bilan uzulish mavjud !";

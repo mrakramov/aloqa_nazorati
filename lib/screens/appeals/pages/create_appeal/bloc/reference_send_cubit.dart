@@ -9,28 +9,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class ReferenceSendCubit extends Cubit<ReferenceSendState> {
   AppealRepository repository;
   ReferenceSendCubit(this.repository) : super(InitialState());
-  void getRegions() async {
-    emit(InitialState());
-    try {
-      emit(LoadingState(true));
-      final response = await repository.getRegions();
-      if (kDebugMode) {
-        // for (var element in response) {
-        //   print(element.id);
-        // }
-
-      }
-      if (response.isNotEmpty) {
-        emit(LoadingState(false));
-        emit(RegionsSuccessState(response));
-      } else {
-        emit(LoadingState(false));
-        emit(ErrorState(response));
-      }
-    } catch (e) {
-      emit(ErrorState(e));
-    }
-  }
 
   void getDistricts(int? regionId) async {
     try {

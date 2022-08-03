@@ -1,5 +1,4 @@
 import 'package:aloqa_nazorati/screens/appeals/data/model/districts_response_model.dart';
-import 'package:aloqa_nazorati/screens/appeals/data/model/regions_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/single_appeal_response.dart';
 
 abstract class ReferenceSendState {
@@ -14,17 +13,6 @@ class DistrictSuccessState extends ReferenceSendState {
   List<DistrictsResponse> districts;
   DistrictsResponse? currentDistrict;
   DistrictSuccessState(this.districts, this.currentDistrict);
-}
-
-class RegionsSuccessState extends ReferenceSendState {
-  List<RegionsResponse> regions;
-  RegionsSuccessState(this.regions);
-  @override
-  String toString() {
-    return """${regions.first.name!.uz}
-    ${regions.length}
-    """;
-  }
 }
 
 class SuccessState extends ReferenceSendState {
