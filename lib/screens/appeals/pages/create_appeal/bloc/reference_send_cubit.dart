@@ -18,6 +18,7 @@ class ReferenceSendCubit extends Cubit<ReferenceSendState> {
         // for (var element in response) {
         //   print(element.id);
         // }
+        print(await Prefs.load('token'));
       }
       if (response.isNotEmpty) {
         emit(LoadingState(false));
@@ -38,9 +39,10 @@ class ReferenceSendCubit extends Cubit<ReferenceSendState> {
       if (districtResponse.isNotEmpty) {
         emit(LoadingState(false));
         emit(DistrictSuccessState(districtResponse));
+      } else {
+        emit(LoadingState(false));
+        emit(ErrorState(districtResponse));
       }
-      emit(LoadingState(false));
-      emit(ErrorState(districtResponse));
     } catch (e) {
       emit(ErrorState(e));
     }
