@@ -4,6 +4,7 @@ import 'package:aloqa_nazorati/screens/appeals/data/network/appeal_repository.da
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/reference_send_cubit.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/reference_send_state.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/custom_button.dart';
+import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/custom_field_for_district.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/custom_form_field.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/file_add_button.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/location_button.dart';
@@ -61,6 +62,27 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
     super.dispose();
   }
 
+  void _onChangeDistricts(int? value, state) {
+    districtId = value!;
+    hintTextDistrict = state.districts
+        .singleWhere((element) => element.id == districtId)
+        .name!
+        .uz;
+    selectedDistrict =
+        state.districts.singleWhere((element) => element.id == districtId);
+    setState(() {});
+  }
+
+  void _onChangeRegions(int? value, dataResponse) {
+    regionId = value!;
+    hintText = dataResponse
+        .singleWhere((element) => element!.id == regionId)!
+        .name!
+        .uz;
+    _cubit.getDistricts(regionId);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -109,19 +131,25 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
             const SizedBox(
               height: 15,
             ),
+
+            ///Regions from hive database
             FutureBuilder<List<Map<String, dynamic>>>(
                 future: Future(() => serviceLocator
                     .get<HiveDB>()
                     .box
                     .get(Strings.regionsDataKey)),
                 builder: (context, snapshot) {
+                  List<DropdownMenuItem<int>> data = [];
                   if (snapshot.hasError) {
+                    return const Center(
+                      child: CupertinoActivityIndicator(),
+                    );
+                  } else if (!snapshot.hasData) {
                     return const Center(
                       child: CupertinoActivityIndicator(),
                     );
                   }
 
-                  List<DropdownMenuItem<int>> data = [];
                   if (snapshot.data!.isNotEmpty) {
                     List<RegionsResponse?>? dataResponse = snapshot.data!
                         .map((e) => RegionsResponse.fromJson(e))
@@ -136,55 +164,18 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
                     if (dataResponse.isEmpty) {
                       return const Center(child: CupertinoActivityIndicator());
                     }
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: TextField(
-                        decoration: InputDecoration(
+                    return CustomFieldForRegions(
+                        prefix: DropdownButton<int?>(
+                            isExpanded: true,
+                            value: regionId!,
                             isDense: true,
-                            filled: false,
-                            enabled: true,
-                            floatingLabelBehavior: FloatingLabelBehavior.never,
-                            labelText: hintText,
-                            // hintText: hintText,
-                            hintStyle:
-                                const TextStyle(color: ColorsUtils.myColor),
-                            focusColor: ColorsUtils.myColor,
-                            floatingLabelStyle:
-                                const TextStyle(color: ColorsUtils.myColor),
-                            focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(
-                              color: ColorsUtils.myColor,
-                            )),
-                            border: const OutlineInputBorder(
-                                borderSide: BorderSide(
-                              color: ColorsUtils.myColor,
-                            )),
-                            // contentPadding: EdgeInsets.zero,
-                            suffixIcon: const Icon(
-                              Icons.expand_more_outlined,
-                              color: Colors.grey,
-                            ),
-                            prefixStyle:
-                                const TextStyle(color: ColorsUtils.myColor),
-                            prefix: DropdownButton<int?>(
-                                isExpanded: true,
-                                value: regionId!,
-                                isDense: true,
-                                icon: const SizedBox.shrink(),
-                                underline: const SizedBox.shrink(),
-                                items: data,
-                                onChanged: (value) {
-                                  regionId = value!;
-                                  hintText = dataResponse
-                                      .singleWhere(
-                                          (element) => element!.id == regionId)!
-                                      .name!
-                                      .uz;
-                                  _cubit.getDistricts(regionId);
-                                  setState(() {});
-                                })),
-                      ),
-                    );
+                            icon: const SizedBox.shrink(),
+                            underline: const SizedBox.shrink(),
+                            items: data,
+                            onChanged: (value) {
+                              _onChangeRegions(value, dataResponse);
+                            }),
+                        hintText: hintText);
                   }
                   return const Center(
                     child: CupertinoActivityIndicator(),
@@ -195,6 +186,7 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
               height: 15,
             ),
 
+            ///districts from state
             BlocBuilder<ReferenceSendCubit, ReferenceSendState>(
                 // bloc: _cubit,
                 builder: (context, state) {
@@ -209,68 +201,23 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
                 if (state.districts.isEmpty) {
                   return const CupertinoActivityIndicator();
                 }
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: TextField(
-                    decoration: InputDecoration(
+                return CustomFieldForRegions(
+                    prefix: DropdownButton<int?>(
+                        isExpanded: true,
+                        value: districtId!,
                         isDense: true,
-                        filled: false,
-                        enabled: true,
-                        floatingLabelBehavior: FloatingLabelBehavior.never,
-                        labelText: hintTextDistrict,
-                        // hintText: hintText,
-                        hintStyle: const TextStyle(color: ColorsUtils.myColor),
-                        focusColor: ColorsUtils.myColor,
-                        floatingLabelStyle:
-                            const TextStyle(color: ColorsUtils.myColor),
-                        focusedBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(
-                          color: ColorsUtils.myColor,
-                        )),
-                        border: const OutlineInputBorder(
-                            borderSide: BorderSide(
-                          color: ColorsUtils.myColor,
-                        )),
-                        // contentPadding: EdgeInsets.zero,
-                        suffixIcon: const Icon(
-                          Icons.expand_more_outlined,
-                          color: Colors.grey,
-                        ),
-                        prefixStyle:
-                            const TextStyle(color: ColorsUtils.myColor),
-                        prefix: DropdownButton<int?>(
-                            isExpanded: true,
-                            value: districtId!,
-                            isDense: true,
-                            icon: const SizedBox.shrink(),
-                            underline: const SizedBox.shrink(),
-                            items: data,
-                            onChanged: (value) {
-                              districtId = value!;
-                              hintTextDistrict = state.districts
-                                  .singleWhere(
-                                      (element) => element.id == districtId)
-                                  .name!
-                                  .uz;
-                              selectedDistrict = state.districts.singleWhere(
-                                  (element) => element.id == districtId);
-                              setState(() {});
-                            })),
-                  ),
-                );
+                        icon: const SizedBox.shrink(),
+                        underline: const SizedBox.shrink(),
+                        items: data,
+                        onChanged: (value) {
+                          _onChangeDistricts(value, state);
+                        }),
+                    hintText: hintTextDistrict);
               }
               return const Center(
                 child: CupertinoActivityIndicator(),
               );
             }),
-
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 15),
-            //   child: DistrictTextField(
-            //     controller: TextEditingController(),
-            //     labelText: 'Tumanni tanlang',
-            //   ),
-            // ),
 
             const SizedBox(
               height: 15,
@@ -282,7 +229,7 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
                 decoration: const InputDecoration(
                     // hintText: 'Manzilni kiriting',
                     labelText: 'Manzilni kiriting',
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    floatingLabelBehavior: FloatingLabelBehavior.auto,
                     border: OutlineInputBorder()),
               ),
             ),
