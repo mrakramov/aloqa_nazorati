@@ -40,6 +40,7 @@ dependencies:
   http: ^0.13.4
   flutter_bloc: ^8.0.1
   file_picker: ^4.5.1
+  file_saver: ^0.1.1
   webview_flutter: ^3.0.4
   url_launcher: ^6.1.2
   font_awesome_flutter: ^10.1.0
@@ -50,6 +51,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   google_maps_flutter: ^2.1.10
+  permission_handler: ^10.0.0
   
 
 dev_dependencies:

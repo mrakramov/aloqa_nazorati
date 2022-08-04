@@ -11,7 +11,9 @@ import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/l
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/optional_text.dart';
 import 'package:aloqa_nazorati/utils/db/hive_db.dart';
 import 'package:aloqa_nazorati/utils/di/locator.dart';
+import 'package:aloqa_nazorati/utils/file/file_service.dart';
 import 'package:aloqa_nazorati/utils/utils.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -267,7 +269,13 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
             FileAddButtonAndCamera(
               context: context,
               callBackForCamera: () {},
-              callBackForFile: () {},
+              callBackForFile: () async {
+                final fileRepo = serviceLocator.get<FileRepo>();
+                FilePickerResult? result = await fileRepo.pickFiles();
+                if (kDebugMode) {
+                  print(result!.files.first.path);
+                }
+              },
               text: "Fayl biriktirish",
             ),
 
