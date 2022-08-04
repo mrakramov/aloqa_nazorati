@@ -48,6 +48,16 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>io.flutter.embedded_views_preview</key>
-<true/>
+   <true/>
+
+   <key>LSSupportsOpeningDocumentsInPlace</key>
+   <true/>
+   <key>UIFileSharingEnabled</key>
+   <true/>
+   <key>com.apple.security.files.downloads.read-write</key>
+   <true/>
+   <key>NSPhotoLibraryUsageDescription</key>
+   <string>Explain why your app uses photo library</string>
+   
 </dict>
 </plist>

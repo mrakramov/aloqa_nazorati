@@ -33,6 +33,8 @@ PODS:
   - file_picker (0.0.1):
     - DKImagePickerController/PhotoGallery
     - Flutter
+  - file_saver (0.0.1):
+    - Flutter
   - Flutter (1.0.0)
   - fluttertoast (0.0.2):
     - Flutter
@@ -46,6 +48,8 @@ PODS:
   - GoogleMaps/Maps (5.2.0):
     - GoogleMaps/Base
   - path_provider_ios (0.0.1):
+    - Flutter
+  - permission_handler_apple (9.0.4):
     - Flutter
   - SDWebImage (5.13.2):
     - SDWebImage/Core (= 5.13.2)
@@ -61,10 +65,12 @@ PODS:
 
 DEPENDENCIES:
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
+  - file_saver (from `.symlinks/plugins/file_saver/ios`)
   - Flutter (from `Flutter`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - google_maps_flutter (from `.symlinks/plugins/google_maps_flutter/ios`)
   - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
   - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/ios`)
@@ -81,6 +87,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   file_picker:
     :path: ".symlinks/plugins/file_picker/ios"
+  file_saver:
+    :path: ".symlinks/plugins/file_saver/ios"
   Flutter:
     :path: Flutter
   fluttertoast:
@@ -89,6 +97,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/google_maps_flutter/ios"
   path_provider_ios:
     :path: ".symlinks/plugins/path_provider_ios/ios"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
   shared_preferences_ios:
     :path: ".symlinks/plugins/shared_preferences_ios/ios"
   url_launcher_ios:
@@ -100,11 +110,13 @@ SPEC CHECKSUMS:
   DKImagePickerController: b512c28220a2b8ac7419f21c491fc8534b7601ac
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
   file_picker: 817ab1d8cd2da9d2da412a417162deee3500fc95
+  file_saver: 503e386464dbe118f630e17b4c2e1190fa0cf808
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   fluttertoast: 16fbe6039d06a763f3533670197d01fc73459037
   google_maps_flutter: c59fc576c0d0c7f4dc4bd63832c862d22d5a7c6d
   GoogleMaps: 025272d5876d3b32604e5c080dc25eaf68764693
   path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
+  permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
   SDWebImage: 72f86271a6f3139cc7e4a89220946489d4b9a866
   shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
   SwiftyGif: 6c3eafd0ce693cad58bb63d2b2fb9bacb8552780
