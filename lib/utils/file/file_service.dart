@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 abstract class FileService {
-  Future<void> pickFiles();
+  Future<void> pickFiles({List<String>? fileTypes});
 }
 
 abstract class FileSaver {
@@ -12,7 +12,7 @@ abstract class FileSaver {
 
 class FileRepo implements FileService, FileSaver {
   @override
-  Future<FilePickerResult?> pickFiles() async {
+  Future<FilePickerResult?> pickFiles({List<String>? fileTypes}) async {
     try {
       if (await Permission.storage.isDenied) {
         await Permission.storage.request();
@@ -23,15 +23,8 @@ class FileRepo implements FileService, FileSaver {
 
       FilePickerResult? results = await FilePicker.platform.pickFiles(
           type: FileType.custom,
-          allowedExtensions: [
-            'pdf',
-            'doc',
-            'docx',
-            'xls',
-            'jpg',
-            'jpeg',
-            'png'
-          ]);
+          allowMultiple: false,
+          allowedExtensions: fileTypes);
       return results;
     } catch (e, s) {
       if (kDebugMode) {

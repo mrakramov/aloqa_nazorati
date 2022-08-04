@@ -26,6 +26,15 @@ class Strings {
   static const stepFourTitle = "Natijani ko’ring";
   static const stepFourContent =
       "Sizning muammongiz xal etilishi bo’yicha natija bilan tanishing va tizimga o’z bahoingizni qo’ying";
+  static List<String>? listFileTypes = [
+    'pdf',
+    'doc',
+    'docx',
+    'xls',
+    'jpg',
+    'jpeg',
+    'png'
+  ];
 }
 
 class ColorsUtils {

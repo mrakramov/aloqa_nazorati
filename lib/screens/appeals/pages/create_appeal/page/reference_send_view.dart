@@ -1,5 +1,8 @@
+/*
+Created by Axmadjon Isaqov on 22:08:06 04.08.2022
+© 2022 @axi_dev 
+*/
 import 'dart:async';
-
 import 'package:aloqa_nazorati/screens/appeals/data/model/districts_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/regions_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/network/appeal_repository.dart';
@@ -44,7 +47,7 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
   late DistrictsResponse? selectedDistrict;
   String? hintText = 'Viloyatni tanlang';
   String? hintTextDistrict = "Tumanni tanlang";
-
+  final _listValueNotifier = ValueNotifier<List<PlatformFile>>([]);
   TextEditingController? murojatController = TextEditingController();
   TextEditingController? addressController = TextEditingController();
 
@@ -145,6 +148,25 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
         });
   }
 
+  ///file button call back
+  void _fileAddButtonCallBack() async {
+    final fileRepo = serviceLocator.get<FileRepo>();
+    FilePickerResult? result =
+        await fileRepo.pickFiles(fileTypes: Strings.listFileTypes);
+
+    _addResultToRow(result!.files);
+
+    if (kDebugMode) {
+      print(result.files.first.path);
+      print(result.count);
+    }
+  }
+
+  void _addResultToRow(List<PlatformFile> list) {
+    _listValueNotifier.value.addAll(list);
+    setState(() {});
+  }
+
   void _onChangeDistricts(int? value, state) {
     districtId = value!;
     hintTextDistrict = state.districts
@@ -176,7 +198,7 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
             appBar: AppBar(
               toolbarHeight: 80,
               leading: const BackButton(),
-              title: const Text("Murojat yuborish",
+              title: const Text("Murojaat yuborish",
                   style: TextStyle(
                       fontFamily: 'Roboto',
                       fontWeight: FontWeight.w500,
@@ -332,9 +354,12 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
             }),
             OptionalText(
                 context: context, text: "(Loksiya belgilash ixtiyoriy)"),
-            const SizedBox(
-              height: 15,
-            ),
+
+            ///longtitude
+            if (_markerList.isNotEmpty)
+              const SizedBox(
+                height: 15,
+              ),
 
             ///latitude
             if (_markerList.isNotEmpty)
@@ -343,9 +368,12 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
                 labelText: _markerList.first.position.latitude.toString(),
                 hintText: 'Lat',
               ),
-            const SizedBox(
-              height: 15,
-            ),
+
+            ///longtitude
+            if (_markerList.isNotEmpty)
+              const SizedBox(
+                height: 15,
+              ),
 
             ///longtitude
             if (_markerList.isNotEmpty)
@@ -368,34 +396,73 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
                 controller: murojatController,
               ),
             ),
-            // SizedBox(
-            //     height: 300,
-            //     width: _size!.width,
-            //     child: GoogleMap(
-            //       mapType: MapType.normal,
-            //       initialCameraPosition: _kGooglePlex,
-            //       onMapCreated: (GoogleMapController controller) {
-            //         _controller.complete(controller);
-            //       },
-            //     )),
 
             ///common button
             FileAddButtonAndCamera(
               context: context,
               callBackForCamera: () {},
-              callBackForFile: () async {
-                final fileRepo = serviceLocator.get<FileRepo>();
-                FilePickerResult? result = await fileRepo.pickFiles();
-                if (kDebugMode) {
-                  print(result!.files.first.path);
-                }
-              },
+              callBackForFile: _fileAddButtonCallBack,
               text: "Fayl biriktirish",
             ),
 
             ///optional text
             OptionalText(
                 context: context, text: "(pdf,doc,docx,xls,jpg,jpeg,png)"),
+            const SizedBox(
+              height: 30,
+            ),
+
+            ///list notifier
+            ValueListenableBuilder<List<PlatformFile>>(
+                valueListenable: _listValueNotifier,
+                builder: (_, value, child) {
+                  if (value.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: SizedBox(
+                      height: 70,
+                      width: _size!.width,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) => AspectRatio(
+                          aspectRatio: 2 / 1.1,
+                          child: Card(
+                            elevation: 0.0,
+                            color: Colors.transparent,
+                            child: Chip(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 20),
+                              label: Text(
+                                value[index].name,
+                                style: const TextStyle(
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              deleteIcon: const Padding(
+                                padding: EdgeInsets.zero,
+                                child: Icon(
+                                  Icons.delete,
+                                  size: 20,
+                                ),
+                              ),
+                              deleteIconColor: Colors.red,
+                              onDeleted: () {
+                                if (_listValueNotifier.value.isEmpty) {
+                                  _listValueNotifier.value.removeAt(index);
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        itemCount: value.length,
+                      ),
+                    ),
+                  );
+                }),
+
             const SizedBox(
               height: 30,
             ),
