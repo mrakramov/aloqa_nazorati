@@ -308,7 +308,9 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
                                         initialCameraPosition: _kGooglePlex,
                                         onMapCreated:
                                             (GoogleMapController controller) {
-                                          _controller.complete(controller);
+                                          if (!_controller.isCompleted) {
+                                            _controller.complete(controller);
+                                          }
                                         },
                                       );
                                     })),
