@@ -162,9 +162,18 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
     }
   }
 
+  ///add platform results to notifier
   void _addResultToRow(List<PlatformFile> list) {
     _listValueNotifier.value.addAll(list);
     setState(() {});
+  }
+
+  ///remove file in index
+  void _removeListNotifierFileInIndex(int? index) {
+    if (_listValueNotifier.value.isNotEmpty) {
+      _listValueNotifier.value.removeAt(index!);
+      setState(() {});
+    }
   }
 
   void _onChangeDistricts(int? value, state) {
@@ -449,11 +458,8 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
                                 ),
                               ),
                               deleteIconColor: Colors.red,
-                              onDeleted: () {
-                                if (_listValueNotifier.value.isEmpty) {
-                                  _listValueNotifier.value.removeAt(index);
-                                }
-                              },
+                              onDeleted: () =>
+                                  _removeListNotifierFileInIndex(index),
                             ),
                           ),
                         ),
