@@ -9,6 +9,7 @@ import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/c
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/custom_field_for_district.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/custom_form_field.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/file_add_button.dart';
+import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/lat_widget.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/location_button.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/optional_text.dart';
 import 'package:aloqa_nazorati/utils/db/hive_db.dart';
@@ -90,6 +91,60 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
     super.dispose();
   }
 
+  ///google map diolog
+  void _showDialogGoogleMap() {
+    showCupertinoDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) {
+          return SimpleDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  child: SizedBox(
+                      height: _size!.height * 0.5,
+                      width: _size!.width,
+                      child: StreamBuilder<List<Marker>>(
+                          stream: _mapMarkerSC.stream,
+                          builder: (context, snapshot) {
+                            return GoogleMap(
+                              mapType: MapType.normal,
+                              markers: _markerList.toSet(),
+                              onTap: (argument) {
+                                final marker = Marker(
+                                    markerId: MarkerId(
+                                        "${argument.longitude}+${argument.longitude}"),
+                                    position: LatLng(
+                                        argument.latitude, argument.longitude));
+                                _markerList.add(marker);
+                                _mapMarkerSink.add(_markerList);
+                                setState(() {});
+                              },
+                              initialCameraPosition: _kGooglePlex,
+                              onMapCreated: (GoogleMapController controller) {
+                                if (!_controller.isCompleted) {
+                                  _controller.complete(controller);
+                                }
+                              },
+                            );
+                          })),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: CupertinoButton(
+                      color: ColorsUtils.myColor,
+                      child: const Text('Tanlash'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      }),
+                )
+              ]);
+        });
+  }
+
   void _onChangeDistricts(int? value, state) {
     districtId = value!;
     hintTextDistrict = state.districts
@@ -109,11 +164,6 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
         .uz;
     _cubit.getDistricts(regionId);
     setState(() {});
-  }
-
-  Future<void> _goToTheLake() async {
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
   }
 
   @override
@@ -277,60 +327,36 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
               return LocationButton(
                 size: _size,
                 text: "Lokatsiyani belgilash",
-                callBack: () {
-                  showCupertinoDialog(
-                      context: context,
-                      barrierDismissible: true,
-                      builder: (context) {
-                        return SimpleDialog(children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 10),
-                            child: SizedBox(
-                                height: _size!.height * 0.5,
-                                width: _size!.width,
-                                child: StreamBuilder<List<Marker>>(
-                                    stream: _mapMarkerSC.stream,
-                                    builder: (context, snapshot) {
-                                      return GoogleMap(
-                                        mapType: MapType.normal,
-                                        markers: _markerList.toSet(),
-                                        onTap: (argument) {
-                                          final marker = Marker(
-                                              markerId: MarkerId(
-                                                  "${argument.longitude}+${argument.longitude}"),
-                                              position: LatLng(
-                                                  argument.latitude,
-                                                  argument.longitude));
-                                          _markerList.add(marker);
-                                          _mapMarkerSink.add(_markerList);
-                                        },
-                                        initialCameraPosition: _kGooglePlex,
-                                        onMapCreated:
-                                            (GoogleMapController controller) {
-                                          if (!_controller.isCompleted) {
-                                            _controller.complete(controller);
-                                          }
-                                        },
-                                      );
-                                    })),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: CupertinoButton(
-                                color: ColorsUtils.myColor,
-                                child: const Text('Tanlash'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                }),
-                          )
-                        ]);
-                      });
-                },
+                callBack: _showDialogGoogleMap,
               );
             }),
             OptionalText(
                 context: context, text: "(Loksiya belgilash ixtiyoriy)"),
+            const SizedBox(
+              height: 15,
+            ),
+
+            ///latitude
+            if (_markerList.isNotEmpty)
+              LatWidget(
+                addressController: addressController,
+                labelText: _markerList.first.position.latitude.toString(),
+                hintText: 'Lat',
+              ),
+            const SizedBox(
+              height: 15,
+            ),
+
+            ///longtitude
+            if (_markerList.isNotEmpty)
+              LatWidget(
+                addressController: addressController,
+                labelText: _markerList.first.position.longitude.toString(),
+                hintText: 'Lng',
+              ),
+            const SizedBox(
+              height: 15,
+            ),
 
             ///Murojat matni
             Padding(
