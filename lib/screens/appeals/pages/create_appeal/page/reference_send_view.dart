@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:aloqa_nazorati/screens/appeals/data/model/districts_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/regions_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/network/appeal_repository.dart';
@@ -44,6 +46,25 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
 
   TextEditingController? murojatController = TextEditingController();
   TextEditingController? addressController = TextEditingController();
+
+  final Completer<GoogleMapController> _controller = Completer();
+
+  static const CameraPosition _kGooglePlex = CameraPosition(
+    target: LatLng(41.2995, 69.2401),
+    zoom: 14.4746,
+  );
+
+  static const CameraPosition _kLake = CameraPosition(
+      bearing: 192.8334901395799,
+      target: LatLng(37.43296265331129, -122.08832357078792),
+      tilt: 59.440717697143555,
+      zoom: 19.151926040649414);
+
+  final _mapMarkerSC = StreamController<List<Marker>>.broadcast();
+
+  StreamSink<List<Marker>> get _mapMarkerSink => _mapMarkerSC.sink;
+
+  final List<Marker> _markerList = [];
   @override
   void initState() {
     if (defaultTargetPlatform == TargetPlatform.android) {
@@ -52,6 +73,7 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
     regionId = 1;
     districtId = 1;
     _cubit.getDistricts(regionId);
+
     super.initState();
   }
 
@@ -87,6 +109,11 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
         .uz;
     _cubit.getDistricts(regionId);
     setState(() {});
+  }
+
+  Future<void> _goToTheLake() async {
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
   }
 
   @override
@@ -246,11 +273,60 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
             ),
 
             ///location button
-            LocationButton(
-              size: _size,
-              text: "Lokatsiyani belgilash",
-              callBack: () {},
-            ),
+            Builder(builder: (context) {
+              return LocationButton(
+                size: _size,
+                text: "Lokatsiyani belgilash",
+                callBack: () {
+                  showCupertinoDialog(
+                      context: context,
+                      barrierDismissible: true,
+                      builder: (context) {
+                        return SimpleDialog(children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 10),
+                            child: SizedBox(
+                                height: _size!.height * 0.5,
+                                width: _size!.width,
+                                child: StreamBuilder<List<Marker>>(
+                                    stream: _mapMarkerSC.stream,
+                                    builder: (context, snapshot) {
+                                      return GoogleMap(
+                                        mapType: MapType.normal,
+                                        markers: _markerList.toSet(),
+                                        onTap: (argument) {
+                                          final marker = Marker(
+                                              markerId: MarkerId(
+                                                  "${argument.longitude}+${argument.longitude}"),
+                                              position: LatLng(
+                                                  argument.latitude,
+                                                  argument.longitude));
+                                          _markerList.add(marker);
+                                          _mapMarkerSink.add(_markerList);
+                                        },
+                                        initialCameraPosition: _kGooglePlex,
+                                        onMapCreated:
+                                            (GoogleMapController controller) {
+                                          _controller.complete(controller);
+                                        },
+                                      );
+                                    })),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: CupertinoButton(
+                                color: ColorsUtils.myColor,
+                                child: const Text('Tanlash'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                }),
+                          )
+                        ]);
+                      });
+                },
+              );
+            }),
             OptionalText(
                 context: context, text: "(Loksiya belgilash ixtiyoriy)"),
 
@@ -264,6 +340,16 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
                 controller: murojatController,
               ),
             ),
+            // SizedBox(
+            //     height: 300,
+            //     width: _size!.width,
+            //     child: GoogleMap(
+            //       mapType: MapType.normal,
+            //       initialCameraPosition: _kGooglePlex,
+            //       onMapCreated: (GoogleMapController controller) {
+            //         _controller.complete(controller);
+            //       },
+            //     )),
 
             ///common button
             FileAddButtonAndCamera(
