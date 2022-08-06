@@ -18,7 +18,7 @@ class CustomFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      elevation: 10,
+      elevation: 4,
       child: Container(
         padding: const EdgeInsets.only(left: 10, right: 10),
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),

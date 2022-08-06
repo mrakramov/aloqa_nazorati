@@ -4,7 +4,7 @@ import 'package:aloqa_nazorati/screens/appeals/data/model/districts_response_mod
 import 'package:aloqa_nazorati/screens/appeals/data/model/single_appeal_response.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/network/http_client_appeal.dart';
 import 'package:aloqa_nazorati/screens/appeals/domain/appeal_repo.dart';
-import 'package:aloqa_nazorati/screens/appeals/data/model/reference_send_model.dart';
+import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_send_model.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../../utils/utils.dart';
@@ -36,11 +36,11 @@ class AppealRepository extends AppealRepo {
   }
 
   @override
-  Future<AppealCreateResponse> referencesSendingMethod(
-      {required ReferenceSendModel? model, required String? token}) async {
+  Future<AppealCreateResponse> appealSendingMethod(
+      {required AppealRequestData? model, required String? token}) async {
     try {
       final response = await _httpClient.postRequest(
-          path: _Urls.referenceSending, body: model!.toJson, token: token);
+          path: _Urls.referenceSending, body: model!.toJson(), token: token);
       if (kDebugMode) {
         print(response['code']);
       }

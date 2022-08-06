@@ -1,7 +1,7 @@
 import 'package:aloqa_nazorati/screens/home/data/model/reference_list_response.dart';
 import 'package:aloqa_nazorati/screens/home/pages/reference_list/bloc/reference_list_bloc.dart';
 import 'package:aloqa_nazorati/screens/home/pages/reference_list/bloc/reference_list_state.dart';
-import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/reference_send_view.dart';
+import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/appeal_send_view.dart';
 import 'package:aloqa_nazorati/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -89,9 +89,9 @@ class _ReferenceListPageState extends State<ReferenceListPage> {
             return ListTile(
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => ReferenceSendPage(
-                        reference_parent_id: widget.data.id,
-                        reference_id: response[index].id)));
+                    builder: (context) => AppealSendPage(
+                        referenceParentId: widget.data.id,
+                        referenceId: response[index].id)));
               },
               title: Text(response[index].name.uz,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(

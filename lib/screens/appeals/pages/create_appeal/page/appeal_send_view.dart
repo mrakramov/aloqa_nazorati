@@ -3,11 +3,13 @@ Created by Axmadjon Isaqov on 22:08:06 04.08.2022
 © 2022 @axi_dev 
 */
 import 'dart:async';
+import 'dart:convert';
+import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_send_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/districts_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/regions_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/network/appeal_repository.dart';
-import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/reference_send_cubit.dart';
-import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/reference_send_state.dart';
+import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/appeal_send_cubit.dart';
+import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/appeal_send_state.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/custom_button.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/custom_field_for_district.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/custom_form_field.dart';
@@ -15,9 +17,11 @@ import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/f
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/lat_widget.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/location_button.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/optional_text.dart';
+import 'package:aloqa_nazorati/screens/auth/data/model/UserDataResponse.dart';
 import 'package:aloqa_nazorati/utils/db/hive_db.dart';
 import 'package:aloqa_nazorati/utils/di/locator.dart';
 import 'package:aloqa_nazorati/utils/file/file_service.dart';
+import 'package:aloqa_nazorati/utils/toast_flutter.dart';
 import 'package:aloqa_nazorati/utils/utils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,25 +30,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class ReferenceSendPage extends StatefulWidget {
-  final int? reference_parent_id;
-  final int? reference_id;
-  const ReferenceSendPage(
-      {super.key,
-      required this.reference_parent_id,
-      required this.reference_id});
+class AppealSendPage extends StatefulWidget {
+  final int? referenceParentId;
+  final int? referenceId;
+  const AppealSendPage(
+      {super.key, required this.referenceParentId, required this.referenceId});
 
   @override
-  State<ReferenceSendPage> createState() => _ReferenceSendPageState();
+  State<AppealSendPage> createState() => _AppealSendPageState();
 }
 
-class _ReferenceSendPageState extends State<ReferenceSendPage> {
-  final ReferenceSendCubit _cubit = ReferenceSendCubit(AppealRepository());
+class _AppealSendPageState extends State<AppealSendPage> {
+  final AppealSendCubit _cubit = AppealSendCubit(AppealRepository());
   Size? _size;
   final key = GlobalKey<FormState>();
   late int? regionId;
   late int? districtId;
   late DistrictsResponse? selectedDistrict;
+  bool? districtSelected = false;
   String? hintText = 'Viloyatni tanlang';
   String? hintTextDistrict = "Tumanni tanlang";
   final _listValueNotifier = ValueNotifier<List<PlatformFile>>([]);
@@ -91,11 +94,13 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
   void dispose() {
     murojatController!.dispose();
     addressController!.dispose();
+    districtSelected = false;
     super.dispose();
   }
 
   ///google map diolog
   void _showDialogGoogleMap() {
+    _markerList.clear();
     showCupertinoDialog(
         context: context,
         barrierDismissible: true,
@@ -159,6 +164,7 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
     if (kDebugMode) {
       print(result.files.first.path);
       print(result.count);
+      print(await Prefs.load('token'));
     }
   }
 
@@ -176,6 +182,7 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
     }
   }
 
+  ///on change districts
   void _onChangeDistricts(int? value, state) {
     districtId = value!;
     hintTextDistrict = state.districts
@@ -184,9 +191,11 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
         .uz;
     selectedDistrict =
         state.districts.singleWhere((element) => element.id == districtId);
+    districtSelected = true;
     setState(() {});
   }
 
+//on change regions
   void _onChangeRegions(int? value, dataResponse) {
     regionId = value!;
     hintText = dataResponse
@@ -197,14 +206,56 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
     setState(() {});
   }
 
+  ///sending appeal
+  void _sendingAppeal() async {
+    if (!districtSelected!) {
+      ToastFlutter.showToast('Malumotlar toliq emas');
+      return;
+    }
+    if (regionId == null ||
+        districtId == null ||
+        widget.referenceId == null ||
+        widget.referenceParentId == null) {
+      ToastFlutter.showToast('Malumotlar toliq emas');
+      return;
+    }
+    if (_markerList.isEmpty) {
+      ToastFlutter.showToast('Malumotlar toliq emas');
+      return;
+    }
+    if (addressController!.text.isEmpty || murojatController!.text.isEmpty) {
+      ToastFlutter.showToast('Malumotlar toliq emas');
+      return;
+    }
+
+    UserDataResponse? userData =
+        UserDataResponse.fromJson(jsonDecode(await Prefs.load('userData')));
+    AppealRequestData? requestData = AppealRequestData(
+      letterId: 1,
+      referenceId: widget.referenceId,
+      referenceParentId: widget.referenceParentId,
+      ticketRegionId: regionId,
+      ticketDistrictId: districtId,
+      phone: userData.data.phone,
+      firstName: userData.data.firstName,
+      lastName: userData.data.lastName,
+      address: addressController!.text,
+      description: murojatController!.text,
+      files: [12, 34],
+    );
+
+    _cubit.appealsUpload(requestData);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => _cubit,
-      child: BlocListener<ReferenceSendCubit, ReferenceSendState>(
+      child: BlocListener<AppealSendCubit, AppealSendState>(
           listener: (context, state) {},
           child: Scaffold(
             appBar: AppBar(
+              centerTitle: false,
               toolbarHeight: 80,
               leading: const BackButton(),
               title: const Text("Murojaat yuborish",
@@ -215,19 +266,21 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
               backgroundColor: ColorsUtils.myColor,
             ),
             body: SafeArea(
-              child: getBody(),
+              child: getBody,
             ),
           )),
     );
   }
 
-  Widget getBody() {
+  ///page body
+  Widget get getBody {
     return SafeArea(
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(
             parent: AlwaysScrollableScrollPhysics()),
         child: Column(
           children: [
+            ///text
             Padding(
               padding: const EdgeInsets.only(left: 15, right: 15, top: 20),
               child: SizedBox(
@@ -303,37 +356,39 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
             ),
 
             ///districts from state
-            BlocBuilder<ReferenceSendCubit, ReferenceSendState>(
-                // bloc: _cubit,
+            BlocBuilder<AppealSendCubit, AppealSendState>(
+                bloc: _cubit,
                 builder: (context, state) {
-              if (state is DistrictSuccessState && state.districts.isNotEmpty) {
-                districtId = state.currentDistrict!.id;
-                List<DropdownMenuItem<int>> data = [];
-                for (var item in state.districts) {
-                  data.add(DropdownMenuItem(
-                      value: item.id, child: Text(item.name!.oz!.toString())));
-                }
+                  if (state is DistrictSuccessState &&
+                      state.districts.isNotEmpty) {
+                    districtId = state.currentDistrict!.id;
+                    List<DropdownMenuItem<int>> data = [];
+                    for (var item in state.districts) {
+                      data.add(DropdownMenuItem(
+                          value: item.id,
+                          child: Text(item.name!.oz!.toString())));
+                    }
 
-                if (state.districts.isEmpty) {
-                  return const CupertinoActivityIndicator();
-                }
-                return CustomFieldForRegions(
-                    prefix: DropdownButton<int?>(
-                        isExpanded: true,
-                        value: districtId!,
-                        isDense: true,
-                        icon: const SizedBox.shrink(),
-                        underline: const SizedBox.shrink(),
-                        items: data,
-                        onChanged: (value) {
-                          _onChangeDistricts(value, state);
-                        }),
-                    hintText: hintTextDistrict);
-              }
-              return const Center(
-                child: CupertinoActivityIndicator(),
-              );
-            }),
+                    if (state.districts.isEmpty) {
+                      return const CupertinoActivityIndicator();
+                    }
+                    return CustomFieldForRegions(
+                        prefix: DropdownButton<int?>(
+                            isExpanded: true,
+                            value: districtId!,
+                            isDense: true,
+                            icon: const SizedBox.shrink(),
+                            underline: const SizedBox.shrink(),
+                            items: data,
+                            onChanged: (value) {
+                              _onChangeDistricts(value, state);
+                            }),
+                        hintText: hintTextDistrict);
+                  }
+                  return const Center(
+                    child: CupertinoActivityIndicator(),
+                  );
+                }),
 
             const SizedBox(
               height: 15,
@@ -373,7 +428,7 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
             ///latitude
             if (_markerList.isNotEmpty)
               LatWidget(
-                addressController: addressController,
+                addressController: TextEditingController(),
                 labelText: _markerList.first.position.latitude.toString(),
                 hintText: 'Lat',
               ),
@@ -387,7 +442,7 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
             ///longtitude
             if (_markerList.isNotEmpty)
               LatWidget(
-                addressController: addressController,
+                addressController: TextEditingController(),
                 labelText: _markerList.first.position.longitude.toString(),
                 hintText: 'Lng',
               ),
@@ -480,7 +535,7 @@ class _ReferenceSendPageState extends State<ReferenceSendPage> {
                 size: _size,
                 context: context,
                 text: "Yuborish",
-                callBack: () {},
+                callback: _sendingAppeal,
               ),
             ),
           ],

@@ -1,14 +1,14 @@
 import 'package:aloqa_nazorati/screens/appeals/data/network/appeal_repository.dart';
-import 'package:aloqa_nazorati/screens/appeals/data/model/reference_send_model.dart';
-import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/reference_send_state.dart';
+import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_send_model.dart';
+import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/appeal_send_state.dart';
 import 'package:aloqa_nazorati/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ReferenceSendCubit extends Cubit<ReferenceSendState> {
+class AppealSendCubit extends Cubit<AppealSendState> {
   AppealRepository repository;
-  ReferenceSendCubit(this.repository) : super(InitialState());
+  AppealSendCubit(this.repository) : super(InitialState());
 
   void getDistricts(int? regionId) async {
     try {
@@ -26,27 +26,15 @@ class ReferenceSendCubit extends Cubit<ReferenceSendState> {
     }
   }
 
-  void referencesUpload() async {
+  void appealsUpload(AppealRequestData? appeal) async {
     if (kDebugMode) {
       print(await Prefs.load("token"));
     }
     try {
       emit(LoadingState(true));
-      ReferenceSendModel? model = ReferenceSendModel.fromJson({
-        "letter_id": 1,
-        "description": "long long text goes here",
-        "first_name": "Somebody",
-        "last_name": "Something",
-        "address": "Somewhere",
-        "ticket_region_id": 3,
-        "ticket_district_id": 180,
-        "phone": "99 999-99-99",
-        "reference_parent_id": 3,
-        "reference_id": 33,
-        "files[]": [15, 16, 17]
-      });
-      final response = await repository.referencesSendingMethod(
-          model: model, token: await Prefs.load("token"));
+      var token = await Prefs.load("token");
+      final response =
+          await repository.appealSendingMethod(model: appeal, token: token);
       if (kDebugMode) {
         print(response.data.firstName);
       }
@@ -57,12 +45,12 @@ class ReferenceSendCubit extends Cubit<ReferenceSendState> {
         print(e);
         print("EXCEPTIONNNNNN");
       }
-      emit(ErrorState(e.toString()));
+      emit(ErrorState(e));
     }
   }
 
   @override
-  void onChange(Change<ReferenceSendState> change) {
+  void onChange(Change<AppealSendState> change) {
     if (kDebugMode) {
       print(change);
     }

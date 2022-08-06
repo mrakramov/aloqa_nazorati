@@ -7,13 +7,13 @@ class CustomButton extends StatelessWidget {
     required Size? size,
     required this.context,
     required this.text,
-    required this.callBack,
+    required this.callback,
   }) : _size = size;
 
   final Size? _size;
   final BuildContext context;
   final String? text;
-  final VoidCallback? callBack;
+  final VoidCallback? callback;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class CustomButton extends StatelessWidget {
       height: 80,
       width: _size!.width,
       child: ElevatedButton(
-        onPressed: callBack,
+        onPressed: callback,
         style: ElevatedButton.styleFrom(
             backgroundColor: ColorsUtils.myColor,
             shape: RoundedRectangleBorder(
