@@ -1,6 +1,6 @@
 import 'package:aloqa_nazorati/screens/appeals/data/network/appeal_repository.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/bloc/appeal_state.dart';
-import 'package:aloqa_nazorati/screens/auth/data/model/UserDataResponse.dart';
+import 'package:aloqa_nazorati/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,6 +13,7 @@ class AppealBloc extends Cubit<AppealState> {
     emit(InitialState());
     try {
       var t = await token;
+      log("log   $t");
       emit(UploadingState(true));
       var result = await repository.appeals(t);
       if (result.data.isNotEmpty) {
@@ -26,5 +27,13 @@ class AppealBloc extends Cubit<AppealState> {
       emit(UploadingState(false));
       emit(ErrorState(e));
     }
+  }
+
+  @override
+  void onChange(Change<AppealState> change) {
+    if (kDebugMode) {
+      print(change);
+    }
+    super.onChange(change);
   }
 }

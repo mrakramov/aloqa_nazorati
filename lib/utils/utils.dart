@@ -1,5 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+void log(Object? msg) {
+  if (kDebugMode) {
+    print(msg);
+  }
+}
 
 class Strings {
   static const dbBoxName = 'region_db';

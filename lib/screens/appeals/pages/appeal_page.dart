@@ -1,11 +1,9 @@
-import 'dart:ffi';
-import 'dart:io';
-
 import 'package:aloqa_nazorati/screens/appeals/data/model/AppealResponse.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/network/appeal_repository.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/appeal_response_page.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/bloc/appeal_bloc.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/bloc/appeal_state.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -30,6 +28,9 @@ class _AppealPageState extends State<AppealPage>
     super.initState();
     _tabController = TabController(initialIndex: 0, length: 3, vsync: this);
     _bloc.appeals(Prefs.load("token"));
+    if (kDebugMode) {
+      Prefs.load('token').then((value) => log(value));
+    }
   }
 
   @override
