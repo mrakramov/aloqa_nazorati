@@ -1,5 +1,4 @@
 import 'package:aloqa_nazorati/screens/appeals/data/model/AppealResponse.dart';
-import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_request_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/regions_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/districts_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/single_appeal_response.dart';
@@ -26,7 +25,9 @@ class AppealRepository extends AppealRepo {
   final HttpClientAppeal _httpClient = HttpClientAppeal();
 
   @override
-  Future<AppealResponse> appeals(String token, {AppealRequest? data}) async {
+  Future<AppealResponse> appeals(
+    String token,
+  ) async {
     try {
       final Map<String, dynamic> response = await _httpClient.getRequest(
         _Urls.appeals,

@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_request_model.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
@@ -18,35 +16,29 @@ class HttpClientAppeal {
     return _instance;
   }
 
-  Future<dynamic> getRequest(String path, String token, bool? shouldToken,
-      {AppealRequest? data}) async {
-    Response<Map<String, dynamic>> response;
+  Future<dynamic> getRequest(
+    String path,
+    String token,
+    bool? shouldToken,
+  ) async {
+    http.Response response;
     if (kDebugMode) {
       print(path);
     }
-
-    final dio =
-        Dio(BaseOptions(connectTimeout: 60000, receiveTimeout: 60000, headers: {
-      "mobile-app-key": Strings.webApiKey,
-      if (shouldToken!) "Authorization": "Bearer $token"
-    }));
     try {
-      // response = await http.get(
-      //   Uri.tryParse(path)!,
-      //   headers: {
-      //     "mobile-app-key": Strings.webApiKey,
-      //     if (shouldToken) "Authorization": "Bearer $token"
-      //   },
-      // );
-      response = await dio.getUri<Map<String, dynamic>>(
+      response = await http.get(
         Uri.tryParse(path)!,
+        headers: {
+          "mobile-app-key": Strings.webApiKey,
+          if (shouldToken!) "Authorization": "Bearer $token"
+        },
       );
       final statusCode = response.statusCode;
-      if (statusCode! >= 200 && statusCode < 299) {
-        if (response.data!.isEmpty) {
+      if (statusCode >= 200 && statusCode < 299) {
+        if (response.body.isEmpty) {
           return <dynamic>[];
         } else {
-          return response.data;
+          return jsonDecode(response.body);
         }
       } else if (statusCode >= 400 && statusCode < 500) {
         throw ClientErrorException();
