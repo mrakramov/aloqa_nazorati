@@ -15,7 +15,10 @@ class AppealBloc extends Cubit<AppealState> {
       var t = await token;
       log("log   $t");
       emit(UploadingState(true));
-      var result = await repository.appeals(t);
+      var result = await repository.appeals(
+        t,
+      );
+      log("DATAAA::${result.data.first.address}");
       if (result.data.isNotEmpty) {
         emit(UploadingState(false));
         emit(SuccessState(result));
