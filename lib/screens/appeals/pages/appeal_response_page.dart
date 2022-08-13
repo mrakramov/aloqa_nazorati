@@ -105,7 +105,7 @@ class _AppealResponsePageState extends State<AppealResponsePage>
             height: 10,
           ),
           Text(
-            widget.data.code,
+            widget.data.code!,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: Colors.black,
                   fontFamily: 'Roboto',
@@ -128,7 +128,7 @@ class _AppealResponsePageState extends State<AppealResponsePage>
             height: 10,
           ),
           Text(
-            widget.data.reference.name.uz,
+            widget.data.reference!.name!.uz!,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: Colors.black,
                   fontFamily: 'Roboto',
@@ -166,7 +166,7 @@ class _AppealResponsePageState extends State<AppealResponsePage>
             height: 10,
           ),
           Text(
-            widget.data.description,
+            widget.data.description!,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: Colors.black,
                   fontFamily: 'Roboto',
@@ -225,7 +225,7 @@ class _AppealResponsePageState extends State<AppealResponsePage>
               height: 10,
             ),
             Text(
-              widget.data.reference.name.uz,
+              widget.data.reference!.name!.uz!,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: Colors.black,
                     fontFamily: 'Roboto',
@@ -317,7 +317,7 @@ class _AppealResponsePageState extends State<AppealResponsePage>
               height: 10,
             ),
             Text(
-              widget.data.ticketRegion.name.uz.toString(),
+              widget.data.ticketRegion!.name!.uz.toString(),
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: Colors.black,
                     fontFamily: 'Roboto',

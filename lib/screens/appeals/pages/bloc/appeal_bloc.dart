@@ -18,8 +18,8 @@ class AppealBloc extends Cubit<AppealState> {
       var result = await repository.appeals(
         t,
       );
-      log("DATAAA::${result.data.first.address}");
-      if (result.data.isNotEmpty) {
+      log("DATAAA::$result");
+      if (result.data!.isNotEmpty) {
         emit(UploadingState(false));
         emit(SuccessState(result));
       } else {
@@ -35,7 +35,7 @@ class AppealBloc extends Cubit<AppealState> {
   @override
   void onChange(Change<AppealState> change) {
     if (kDebugMode) {
-      print(change);
+      print(change.nextState);
     }
     super.onChange(change);
   }

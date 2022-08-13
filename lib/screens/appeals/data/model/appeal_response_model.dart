@@ -1,4 +1,4 @@
-class ReferenceResponseModel {
+class AppealResponseModel {
   bool? isSend;
   String? firstName;
   String? lastName;
@@ -19,7 +19,7 @@ class ReferenceResponseModel {
   DateTime? createdAt;
   int? id;
 
-  ReferenceResponseModel.fromJson(Map<String, dynamic> json) {
+  AppealResponseModel.fromJson(Map<String, dynamic> json) {
     isSend = json['is_send'];
     firstName = json['first_name'];
     lastName = json['last_name'];

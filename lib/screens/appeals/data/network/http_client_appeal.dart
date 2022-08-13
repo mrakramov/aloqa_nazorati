@@ -33,6 +33,7 @@ class HttpClientAppeal {
           if (shouldToken!) "Authorization": "Bearer $token"
         },
       );
+      log(response.body);
       final statusCode = response.statusCode;
       if (statusCode >= 200 && statusCode < 299) {
         if (response.body.isEmpty) {

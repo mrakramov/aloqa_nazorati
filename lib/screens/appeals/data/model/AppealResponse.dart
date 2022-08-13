@@ -12,9 +12,9 @@ class AppealResponse {
     required this.data,
   });
 
-  String status;
-  String code;
-  List<Datum> data;
+  String? status;
+  String? code;
+  List<Datum?>? data;
 
   AppealResponse copyWith({
     String? status,
@@ -37,7 +37,7 @@ class AppealResponse {
   Map<String, dynamic> toJson() => {
         "status": status,
         "code": code,
-        "data": data = List<Datum>.from(data.map((x) => x.toJson())),
+        "data": data = List<Datum>.from(data!.map((x) => x!.toJson())),
       };
 }
 
@@ -80,41 +80,41 @@ class Datum {
     required this.reference,
   });
 
-  int id;
-  String code;
-  String firstName;
-  String lastName;
+  int? id;
+  String? code;
+  String? firstName;
+  String? lastName;
   dynamic middleName;
-  String address;
-  String phone;
-  String userType;
-  String source;
-  String description;
-  int ticketRegionId;
-  int ticketDistrictId;
-  int referenceParentId;
-  int referenceId;
+  String? address;
+  String? phone;
+  String? userType;
+  String? source;
+  String? description;
+  int? ticketRegionId;
+  int? ticketDistrictId;
+  int? referenceParentId;
+  int? referenceId;
   dynamic subjectParentId;
   dynamic subjectId;
   dynamic senderId;
   dynamic receiverId;
-  bool isSend;
-  DateTime sentAt;
-  DateTime createdAt;
-  DateTime updatedAt;
+  bool? isSend;
+  DateTime? sentAt;
+  DateTime? createdAt;
+  DateTime? updatedAt;
   dynamic extraPhone;
   dynamic deletedAt;
   dynamic email;
-  int letterId;
+  int? letterId;
   dynamic file;
   dynamic extraCode;
-  int userId;
-  String status;
-  Reference ticketRegion;
-  Reference ticketDistrict;
-  ResponseLetter responseLetter;
-  Reference referenceParent;
-  Reference reference;
+  int? userId;
+  String? status;
+  Reference? ticketRegion;
+  Reference? ticketDistrict;
+  ResponseLetter? responseLetter;
+  Reference? referenceParent;
+  Reference? reference;
 
   Datum copyWith({
     int? id,
@@ -253,9 +253,9 @@ class Datum {
         "sender_id": senderId,
         "receiver_id": receiverId,
         "is_send": isSend,
-        "sent_at": sentAt == null ? null : sentAt.toIso8601String(),
-        "created_at": createdAt == null ? null : createdAt.toIso8601String(),
-        "updated_at": updatedAt == null ? null : updatedAt.toIso8601String(),
+        "sent_at": sentAt == null ? null : sentAt!.toIso8601String(),
+        "created_at": createdAt == null ? null : createdAt!.toIso8601String(),
+        "updated_at": updatedAt == null ? null : updatedAt!.toIso8601String(),
         "extra_phone": extraPhone,
         "deleted_at": deletedAt,
         "email": email,
@@ -264,14 +264,14 @@ class Datum {
         "extra_code": extraCode,
         "user_id": userId,
         "status": status,
-        "ticket_region": ticketRegion == null ? null : ticketRegion.toJson(),
+        "ticket_region": ticketRegion == null ? null : ticketRegion!.toJson(),
         "ticket_district":
-            ticketDistrict == null ? null : ticketDistrict.toJson(),
+            ticketDistrict == null ? null : ticketDistrict!.toJson(),
         "response_letter":
-            responseLetter == null ? null : responseLetter.toJson(),
+            responseLetter == null ? null : responseLetter!.toJson(),
         "reference_parent":
-            referenceParent == null ? null : referenceParent.toJson(),
-        "reference": reference == null ? null : reference.toJson(),
+            referenceParent == null ? null : referenceParent!.toJson(),
+        "reference": reference == null ? null : reference!.toJson(),
       };
 }
 
@@ -281,8 +281,8 @@ class Reference {
     required this.name,
   });
 
-  int id;
-  ReferenceName name;
+  int? id;
+  ReferenceName? name;
 
   Reference copyWith({
     int? id,
@@ -300,7 +300,7 @@ class Reference {
 
   Map<String, dynamic> toJson() => {
         "id": id,
-        "name": name == null ? null : name.toJson(),
+        "name": name == null ? null : name!.toJson(),
       };
 }
 
@@ -312,10 +312,10 @@ class ReferenceName {
     required this.en,
   });
 
-  String oz;
-  String uz;
-  String ru;
-  String en;
+  String? oz;
+  String? uz;
+  String? ru;
+  String? en;
 
   ReferenceName copyWith({
     String? oz,
@@ -351,8 +351,8 @@ class ResponseLetter {
     required this.name,
   });
 
-  int id;
-  ResponseLetterName name;
+  int? id;
+  ResponseLetterName? name;
 
   ResponseLetter copyWith({
     int? id,
@@ -370,7 +370,7 @@ class ResponseLetter {
 
   Map<String, dynamic> toJson() => {
         "id": id,
-        "name": name == null ? null : name.toJson(),
+        "name": name == null ? null : name!.toJson(),
       };
 }
 
@@ -380,8 +380,8 @@ class ResponseLetterName {
     required this.uz,
   });
 
-  String oz;
-  String uz;
+  String? oz;
+  String? uz;
 
   ResponseLetterName copyWith({
     String? oz,

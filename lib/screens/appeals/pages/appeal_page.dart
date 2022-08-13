@@ -136,32 +136,32 @@ class _AppealPageState extends State<AppealPage>
     );
   }
 
-  _appealData(List<Datum> data) {
+  _appealData(List<Datum?>? data) {
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
-      itemCount: data.length,
+      itemCount: data!.length,
       itemBuilder: (context, index) {
-        return _itemAppeal(data[index]);
+        return _itemAppeal(data[index]!);
       },
     );
   }
 
-  _appealList(List<Datum> data, int index) {
+  _appealList(List<Datum?>? data, int index) {
     if (index == 0) {
-      if (data.isNotEmpty) {
+      if (data!.isNotEmpty) {
         return _appealData(data);
       }
       return _dataNotFound();
     } else if (index == 1) {
-      var newL = data
-          .where((e) => int.parse(e.status) != 1 && int.parse(e.status) != 5)
+      var newL = data!
+          .where((e) => int.parse(e!.status!) != 1 && int.parse(e.status!) != 5)
           .toList();
       if (newL.isNotEmpty) {
         return _appealData(newL);
       }
       return _dataNotFound();
     } else if (index == 2) {
-      var newL = data.where((e) => int.parse(e.status) == 5).toList();
+      var newL = data!.where((e) => int.parse(e!.status!) == 5).toList();
       if (newL.isNotEmpty) {
         return _appealData(newL);
       }
@@ -234,7 +234,7 @@ class _AppealPageState extends State<AppealPage>
                 height: 10,
               ),
               Text(
-                data.reference.name.uz,
+                data.reference!.name!.uz!,
                 textAlign: TextAlign.start,
                 maxLines: 2,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
