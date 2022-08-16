@@ -50,7 +50,7 @@ class AppealRequestData {
     data['phone'] = phone;
     data['reference_parent_id'] = referenceParentId;
     data['reference_id'] = referenceId;
-    // data['files[]'] = files;
+    data['files[]'] = files;
     return data;
   }
 }

@@ -14,10 +14,10 @@ class UserDataResponse {
     required this.message,
   });
 
-  String status;
-  Data data;
-  String token;
-  String message;
+  String? status;
+  Data? data;
+  String? token;
+  String? message;
 
   UserDataResponse copyWith({
     required String status,
@@ -42,7 +42,7 @@ class UserDataResponse {
 
   Map<String, dynamic> toJson() => {
         "status": status,
-        "data": data = data.toJson() as Data,
+        "data": data = data!.toJson() as Data,
         "token": token,
         "message": message,
       };
@@ -77,31 +77,31 @@ class Data {
     required this.oneIdCode,
   });
 
-  int id;
-  String name;
-  String email;
-  DateTime emailVerifiedAt;
-  DateTime createdAt;
-  DateTime updatedAt;
-  String firstName;
-  String lastName;
+  int? id;
+  String? name;
+  String? email;
+  DateTime? emailVerifiedAt;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+  String? firstName;
+  String? lastName;
   dynamic phone;
   dynamic code;
-  DateTime codeVerifiedAt;
-  bool isVerified;
+  DateTime? codeVerifiedAt;
+  bool? isVerified;
   dynamic deletedAt;
   dynamic photo;
-  DateTime birthDate;
-  String citizen;
-  String address;
-  String mobPhoneNo;
-  String birthPlace;
-  String midName;
-  String userType;
-  String sessId;
-  String retCd;
-  bool isOneId;
-  String oneIdCode;
+  DateTime? birthDate;
+  String? citizen;
+  String? address;
+  String? mobPhoneNo;
+  String? birthPlace;
+  String? midName;
+  String? userType;
+  String? sessId;
+  String? retCd;
+  bool? isOneId;
+  String? oneIdCode;
 
   Data copyWith({
     int? id,
@@ -193,21 +193,21 @@ class Data {
         "name": name,
         "email": email,
         "email_verified_at":
-            emailVerifiedAt == null ? null : emailVerifiedAt.toIso8601String(),
-        "created_at": createdAt == null ? null : createdAt.toIso8601String(),
-        "updated_at": updatedAt == null ? null : updatedAt.toIso8601String(),
+            emailVerifiedAt == null ? null : emailVerifiedAt!.toIso8601String(),
+        "created_at": createdAt == null ? null : createdAt!.toIso8601String(),
+        "updated_at": updatedAt == null ? null : updatedAt!.toIso8601String(),
         "first_name": firstName,
         "last_name": lastName,
         "phone": phone,
         "code": code,
         "code_verified_at":
-            codeVerifiedAt == null ? null : codeVerifiedAt.toIso8601String(),
+            codeVerifiedAt == null ? null : codeVerifiedAt!.toIso8601String(),
         "is_verified": isVerified,
         "deleted_at": deletedAt,
         "photo": photo,
         "birth_date": birthDate == null
             ? null
-            : "${birthDate.year.toString().padLeft(4, '0')}-${birthDate.month.toString().padLeft(2, '0')}-${birthDate.day.toString().padLeft(2, '0')}",
+            : "${birthDate!.year.toString().padLeft(4, '0')}-${birthDate!.month.toString().padLeft(2, '0')}-${birthDate!.day.toString().padLeft(2, '0')}",
         "citizen": citizen,
         "address": address,
         "mob_phone_no": mobPhoneNo,

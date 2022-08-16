@@ -4,10 +4,12 @@ Created by Axmadjon Isaqov on 22:08:06 04.08.2022
 */
 import 'dart:async';
 import 'dart:convert';
+import 'package:aloqa_nazorati/main.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_send_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/districts_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/regions_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/network/appeal_repository.dart';
+import 'package:aloqa_nazorati/screens/appeals/pages/camera/camera_page.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/appeal_send_cubit.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/appeal_send_state.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/custom_button.dart';
@@ -23,12 +25,14 @@ import 'package:aloqa_nazorati/utils/di/locator.dart';
 import 'package:aloqa_nazorati/utils/file/file_service.dart';
 import 'package:aloqa_nazorati/utils/toast_flutter.dart';
 import 'package:aloqa_nazorati/utils/utils.dart';
+import 'package:camera/camera.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class AppealSendPage extends StatefulWidget {
   final int? referenceParentId;
@@ -48,9 +52,10 @@ class _AppealSendPageState extends State<AppealSendPage> {
   late int? districtId;
   late DistrictsResponse? selectedDistrict;
   bool? districtSelected = false;
+  bool? regionSelected = false;
   String? hintText = 'Viloyatni tanlang';
   String? hintTextDistrict = "Tumanni tanlang";
-  final _listValueNotifier = ValueNotifier<List<PlatformFile>>([]);
+  final _listValueNotifier = ValueNotifier<List<dynamic>>([]);
   TextEditingController? murojatController = TextEditingController();
   TextEditingController? addressController = TextEditingController();
 
@@ -203,6 +208,7 @@ class _AppealSendPageState extends State<AppealSendPage> {
         .name!
         .uz;
     _cubit.getDistricts(regionId);
+    regionSelected = true;
     setState(() {});
   }
 
@@ -228,22 +234,21 @@ class _AppealSendPageState extends State<AppealSendPage> {
       return;
     }
 
-    UserDataResponse? userData =
-        UserDataResponse.fromJson(jsonDecode(await Prefs.load('userData')));
+    Data? userData = Data.fromJson(jsonDecode(await Prefs.load('userData')));
     AppealRequestData? requestData = AppealRequestData(
       letterId: 1,
       referenceId: widget.referenceId,
       referenceParentId: widget.referenceParentId,
       ticketRegionId: regionId,
       ticketDistrictId: districtId,
-      phone: userData.data.phone,
-      firstName: userData.data.firstName,
-      lastName: userData.data.lastName,
+      phone: userData.mobPhoneNo,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
       address: addressController!.text,
       description: murojatController!.text,
-      files: [12, 34],
+      // files: [12, 34],
     );
-
+    log(requestData.toJson());
     _cubit.appealsUpload(requestData);
   }
 
@@ -372,18 +377,21 @@ class _AppealSendPageState extends State<AppealSendPage> {
                     if (state.districts.isEmpty) {
                       return const CupertinoActivityIndicator();
                     }
-                    return CustomFieldForRegions(
-                        prefix: DropdownButton<int?>(
-                            isExpanded: true,
-                            value: districtId!,
-                            isDense: true,
-                            icon: const SizedBox.shrink(),
-                            underline: const SizedBox.shrink(),
-                            items: data,
-                            onChanged: (value) {
-                              _onChangeDistricts(value, state);
-                            }),
-                        hintText: hintTextDistrict);
+                    return IgnorePointer(
+                      ignoring: !regionSelected!,
+                      child: CustomFieldForRegions(
+                          prefix: DropdownButton<int?>(
+                              isExpanded: true,
+                              value: districtId!,
+                              isDense: true,
+                              icon: const SizedBox.shrink(),
+                              underline: const SizedBox.shrink(),
+                              items: data,
+                              onChanged: (value) {
+                                _onChangeDistricts(value, state);
+                              }),
+                          hintText: hintTextDistrict),
+                    );
                   }
                   return const Center(
                     child: CupertinoActivityIndicator(),
@@ -464,7 +472,26 @@ class _AppealSendPageState extends State<AppealSendPage> {
             ///common button
             FileAddButtonAndCamera(
               context: context,
-              callBackForCamera: () {},
+              callBackForCamera: () async {
+                try {
+                  final cameraPermisson = await Permission.camera.request();
+                  if (cameraPermisson == PermissionStatus.denied) return;
+                  final firstCamera = cameraList!.first;
+                  // ignore: use_build_context_synchronously
+                  final XFile? fileImage = await Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                          builder: (context) => CameraPage(
+                                description: firstCamera,
+                              )));
+
+                  _listValueNotifier.value.add(fileImage);
+                  ToastFlutter.showToast('Rasm saqlandi');
+                  setState(() {});
+                } catch (e) {
+                  log(e);
+                }
+              },
               callBackForFile: _fileAddButtonCallBack,
               text: "Fayl biriktirish",
             ),
@@ -477,51 +504,92 @@ class _AppealSendPageState extends State<AppealSendPage> {
             ),
 
             ///list notifier
-            ValueListenableBuilder<List<PlatformFile>>(
+            ValueListenableBuilder<List<dynamic>>(
                 valueListenable: _listValueNotifier,
                 builder: (_, value, child) {
                   if (value.isEmpty) {
                     return const SizedBox.shrink();
-                  }
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: SizedBox(
-                      height: 70,
-                      width: _size!.width,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) => AspectRatio(
-                          aspectRatio: 2 / 1.1,
-                          child: Card(
-                            elevation: 0.0,
-                            color: Colors.transparent,
-                            child: Chip(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 20),
-                              label: Text(
-                                value[index].name,
-                                style: const TextStyle(
-                                  overflow: TextOverflow.ellipsis,
+                  } else if (value is PlatformFile) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: SizedBox(
+                        height: 70,
+                        width: _size!.width,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) => AspectRatio(
+                            aspectRatio: 2 / 1.1,
+                            child: Card(
+                              elevation: 0.0,
+                              color: Colors.transparent,
+                              child: Chip(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 20),
+                                label: Text(
+                                  value[index].name,
+                                  style: const TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
-                              ),
-                              deleteIcon: const Padding(
-                                padding: EdgeInsets.zero,
-                                child: Icon(
-                                  Icons.delete,
-                                  size: 20,
+                                deleteIcon: const Padding(
+                                  padding: EdgeInsets.zero,
+                                  child: Icon(
+                                    Icons.delete,
+                                    size: 20,
+                                  ),
                                 ),
+                                deleteIconColor: Colors.red,
+                                onDeleted: () =>
+                                    _removeListNotifierFileInIndex(index),
                               ),
-                              deleteIconColor: Colors.red,
-                              onDeleted: () =>
-                                  _removeListNotifierFileInIndex(index),
                             ),
                           ),
+                          itemCount: value.length,
                         ),
-                        itemCount: value.length,
                       ),
-                    ),
-                  );
+                    );
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: SizedBox(
+                        height: 70,
+                        width: _size!.width,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) => AspectRatio(
+                            aspectRatio: 2 / 1.1,
+                            child: Card(
+                              elevation: 0.0,
+                              color: Colors.transparent,
+                              child: Chip(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 20),
+                                label: Text(
+                                  value[index].name,
+                                  style: const TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                deleteIcon: const Padding(
+                                  padding: EdgeInsets.zero,
+                                  child: Icon(
+                                    Icons.delete,
+                                    size: 20,
+                                  ),
+                                ),
+                                deleteIconColor: Colors.red,
+                                onDeleted: () =>
+                                    _removeListNotifierFileInIndex(index),
+                              ),
+                            ),
+                          ),
+                          itemCount: value.length,
+                        ),
+                      ),
+                    );
+                  }
                 }),
 
             const SizedBox(

@@ -73,7 +73,7 @@ class _AboutUserPageState extends State<AboutUserPage> {
               height: 5,
             ),
             Text(
-              widget.data.name,
+              widget.data.name!,
               textAlign: TextAlign.start,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: Colors.black,
@@ -110,7 +110,7 @@ class _AboutUserPageState extends State<AboutUserPage> {
               height: 5,
             ),
             Text(
-              widget.data.email,
+              widget.data.email!,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: Colors.black,
@@ -147,7 +147,7 @@ class _AboutUserPageState extends State<AboutUserPage> {
               height: 5,
             ),
             Text(
-              widget.data.address,
+              widget.data.address!,
               textAlign: TextAlign.start,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: Colors.black,
@@ -184,7 +184,7 @@ class _AboutUserPageState extends State<AboutUserPage> {
               height: 5,
             ),
             Text(
-              widget.data.mobPhoneNo,
+              widget.data.mobPhoneNo!,
               textAlign: TextAlign.start,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: Colors.black,

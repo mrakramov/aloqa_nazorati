@@ -1,10 +1,13 @@
 import 'package:aloqa_nazorati/screens/auth/pages/id_page.dart';
 import 'package:aloqa_nazorati/utils/di/locator.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+List<CameraDescription>? cameraList;
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setup();
+  cameraList = await availableCameras();
   runApp(const MyApp());
 }
 

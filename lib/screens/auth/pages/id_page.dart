@@ -1,13 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
-import 'package:aloqa_nazorati/screens/auth/data/model/UserDataResponse.dart';
 import 'package:aloqa_nazorati/screens/auth/data/network/auth_repository.dart';
 import 'package:aloqa_nazorati/screens/auth/pages/bloc/auth_bloc.dart';
 import 'package:aloqa_nazorati/screens/auth/pages/bloc/auth_state.dart';
 import 'package:aloqa_nazorati/utils/utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -47,8 +44,9 @@ class _IdGovPageState extends State<IdGovPage> {
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is SuccessState) {
-            Prefs.save("token", state.response.token);
+            Prefs.save("token", state.response.token!);
             Prefs.save("userData", jsonEncode(state.response.data));
+
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => const MainPage()));
           }
