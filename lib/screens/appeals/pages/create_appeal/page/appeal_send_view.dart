@@ -485,8 +485,10 @@ class _AppealSendPageState extends State<AppealSendPage> {
                                 description: firstCamera,
                               )));
 
-                  _listValueNotifier.value.add(fileImage);
-                  ToastFlutter.showToast('Rasm saqlandi');
+                  if (fileImage != null) {
+                    _listValueNotifier.value.add(fileImage);
+                    ToastFlutter.showToast('Rasm saqlandi');
+                  }
                   setState(() {});
                 } catch (e) {
                   log(e);

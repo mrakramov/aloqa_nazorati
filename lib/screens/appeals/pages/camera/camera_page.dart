@@ -40,7 +40,27 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
           children: [
             Expanded(
               flex: 6,
-              child: body!,
+              child: Stack(
+                children: [
+                  body!,
+                  Positioned(
+                      top: .0,
+                      right: .0,
+                      left: .0,
+                      child: ListTile(
+                        leading: IconButton(
+                            onPressed: () {
+                              if (Navigator.canPop(context)) {
+                                Navigator.of(context).pop();
+                              }
+                            },
+                            icon: const Icon(
+                              Icons.arrow_back,
+                              color: ColorsUtils.myColor,
+                            )),
+                      ))
+                ],
+              ),
             ),
             Expanded(flex: 2, child: takePickButton!)
           ],
