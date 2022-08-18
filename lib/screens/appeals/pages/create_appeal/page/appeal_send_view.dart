@@ -25,13 +25,13 @@ import 'package:aloqa_nazorati/utils/di/locator.dart';
 import 'package:aloqa_nazorati/utils/file/file_service.dart';
 import 'package:aloqa_nazorati/utils/toast_flutter.dart';
 import 'package:aloqa_nazorati/utils/utils.dart';
-import 'package:camera/camera.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class AppealSendPage extends StatefulWidget {
@@ -58,7 +58,7 @@ class _AppealSendPageState extends State<AppealSendPage> {
   final _listValueNotifier = ValueNotifier<List<dynamic>>([]);
   TextEditingController? murojatController = TextEditingController();
   TextEditingController? addressController = TextEditingController();
-
+  late ImagePicker? _imagePicker;
   final Completer<GoogleMapController> _controller = Completer();
 
   static const CameraPosition _kGooglePlex = CameraPosition(
@@ -79,6 +79,7 @@ class _AppealSendPageState extends State<AppealSendPage> {
   final List<Marker> _markerList = [];
   @override
   void initState() {
+    _imagePicker = ImagePicker();
     if (defaultTargetPlatform == TargetPlatform.android) {
       AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
     }
@@ -101,6 +102,44 @@ class _AppealSendPageState extends State<AppealSendPage> {
     addressController!.dispose();
     districtSelected = false;
     super.dispose();
+  }
+
+  ///camera page
+  void _cameraPage() async {
+    try {
+      final cameraPermisson = await Permission.camera.request();
+      if (cameraPermisson == PermissionStatus.denied) return;
+      final firstCamera = cameraList!.first;
+      // ignore: use_build_context_synchronously
+      final XFile? fileImage = await Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (context) => CameraPage(
+                    description: firstCamera,
+                  )));
+
+      if (fileImage != null) {
+        _listValueNotifier.value.add(fileImage);
+        ToastFlutter.showToast('Rasm saqlandi');
+      }
+      setState(() {});
+    } catch (e) {
+      log(e);
+    }
+  }
+
+  ///pick images from image
+  void _pickImagesFromCamera() async {
+    try {
+      final XFile? fileImage =
+          await _imagePicker!.pickImage(source: ImageSource.camera);
+
+      if (fileImage != null) {
+        _listValueNotifier.value.add(fileImage);
+        setState(() {});
+        ToastFlutter.showToast('Rasm saqlandi');
+      }
+    } catch (e) {}
   }
 
   ///google map diolog
@@ -472,28 +511,7 @@ class _AppealSendPageState extends State<AppealSendPage> {
             ///common button
             FileAddButtonAndCamera(
               context: context,
-              callBackForCamera: () async {
-                try {
-                  final cameraPermisson = await Permission.camera.request();
-                  if (cameraPermisson == PermissionStatus.denied) return;
-                  final firstCamera = cameraList!.first;
-                  // ignore: use_build_context_synchronously
-                  final XFile? fileImage = await Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                          builder: (context) => CameraPage(
-                                description: firstCamera,
-                              )));
-
-                  if (fileImage != null) {
-                    _listValueNotifier.value.add(fileImage);
-                    ToastFlutter.showToast('Rasm saqlandi');
-                  }
-                  setState(() {});
-                } catch (e) {
-                  log(e);
-                }
-              },
+              callBackForCamera: _pickImagesFromCamera,
               callBackForFile: _fileAddButtonCallBack,
               text: "Fayl biriktirish",
             ),
