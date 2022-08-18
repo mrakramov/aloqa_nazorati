@@ -46,6 +46,7 @@ class Strings {
 
 class ColorsUtils {
   static const myColor = Color.fromRGBO(68, 30, 221, 1);
+  static const Color buttonColor = Color(0xFF504aba);
 }
 
 class Prefs {

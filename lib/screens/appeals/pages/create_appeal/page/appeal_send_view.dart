@@ -463,6 +463,9 @@ class _AppealSendPageState extends State<AppealSendPage> {
                 callBack: _showDialogGoogleMap,
               );
             }),
+            const SizedBox(
+              height: 5,
+            ),
             OptionalText(
                 context: context, text: "(Loksiya belgilash ixtiyoriy)"),
 
@@ -514,6 +517,9 @@ class _AppealSendPageState extends State<AppealSendPage> {
               callBackForCamera: _pickImagesFromCamera,
               callBackForFile: _fileAddButtonCallBack,
               text: "Fayl biriktirish",
+            ),
+            const SizedBox(
+              height: 10,
             ),
 
             ///optional text
@@ -625,6 +631,9 @@ class _AppealSendPageState extends State<AppealSendPage> {
                 text: "Yuborish",
                 callback: _sendingAppeal,
               ),
+            ),
+            const SizedBox(
+              height: 30,
             ),
           ],
         ),

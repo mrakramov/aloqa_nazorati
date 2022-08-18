@@ -23,11 +23,13 @@ class FileAddButtonAndCamera extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Card(
+          margin: EdgeInsets.zero,
+          elevation: .0,
           child: SizedBox(
             height: 60,
             child: OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
-                    foregroundColor: ColorsUtils.myColor,
+                    foregroundColor: ColorsUtils.buttonColor,
                     side: const BorderSide(color: ColorsUtils.myColor),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10))),
@@ -38,14 +40,14 @@ class FileAddButtonAndCamera extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       color: ColorsUtils.myColor,
                       fontSize: 18,
-                      fontWeight: FontWeight.w600),
+                      fontWeight: FontWeight.w500),
                 )),
           ),
         ),
         IconButton(
             onPressed: callBackForCamera,
-            icon: const Icon(
-              Icons.camera,
+            icon: Image.asset(
+              'assets/icons/camera.png',
               color: ColorsUtils.myColor,
             )),
       ],

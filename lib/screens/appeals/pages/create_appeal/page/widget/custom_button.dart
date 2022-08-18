@@ -18,7 +18,7 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 80,
+      height: 70,
       width: _size!.width,
       child: ElevatedButton(
         onPressed: callback,
@@ -29,7 +29,7 @@ class CustomButton extends StatelessWidget {
         child: Text(
           text!,
           style: Theme.of(context).textTheme.titleMedium!.copyWith(
-              color: Colors.white, fontSize: 22, fontWeight: FontWeight.w600),
+              color: Colors.white, fontSize: 20, fontWeight: FontWeight.w500),
         ),
       ),
     );

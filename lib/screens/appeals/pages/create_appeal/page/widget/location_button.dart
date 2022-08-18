@@ -1,6 +1,5 @@
 import 'package:aloqa_nazorati/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LocationButton extends StatelessWidget {
   const LocationButton({
@@ -22,18 +21,22 @@ class LocationButton extends StatelessWidget {
       width: double.infinity,
       child: OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
-              foregroundColor: ColorsUtils.myColor,
+              foregroundColor: ColorsUtils.buttonColor,
               side: const BorderSide(color: ColorsUtils.myColor),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10))),
           onPressed: callBack,
-          icon: const FaIcon(FontAwesomeIcons.mapLocationDot),
+          icon: Image.asset(
+            'assets/icons/map_location.png',
+            color: ColorsUtils.buttonColor,
+            width: 30,
+          ),
           label: Text(
             text!,
             style: Theme.of(context).textTheme.titleMedium!.copyWith(
                 color: ColorsUtils.myColor,
                 fontSize: 16,
-                fontWeight: FontWeight.w600),
+                fontWeight: FontWeight.w500),
           )),
     );
   }
