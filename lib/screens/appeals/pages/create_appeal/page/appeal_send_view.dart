@@ -579,36 +579,83 @@ class _AppealSendPageState extends State<AppealSendPage> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       child: SizedBox(
-                        height: 70,
+                        height: 50,
                         width: _size!.width,
                         child: ListView.builder(
                           shrinkWrap: true,
                           scrollDirection: Axis.horizontal,
                           itemBuilder: (context, index) => AspectRatio(
-                            aspectRatio: 2 / 1.1,
+                            aspectRatio: 2 / 0.9,
                             child: Card(
                               elevation: 0.0,
+
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6)),
                               color: Colors.transparent,
-                              child: Chip(
+                              child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 20),
-                                label: Text(
-                                  value[index].name,
-                                  style: const TextStyle(
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(6),
+                                  color: const Color(0xFFE4E4E4),
                                 ),
-                                deleteIcon: const Padding(
-                                  padding: EdgeInsets.zero,
-                                  child: Icon(
-                                    Icons.delete,
-                                    size: 20,
-                                  ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 6,
+                                      child: Text(
+                                        value[index].name,
+                                        style: const TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                        flex: 4,
+                                        child: GestureDetector(
+                                          onTap: () =>
+                                              _removeListNotifierFileInIndex(
+                                                  index),
+                                          child: Container(
+                                            height: 50,
+                                            width: 50,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: Colors.red,
+                                            ),
+                                            alignment: Alignment.center,
+                                            child: const Icon(
+                                              Icons.delete,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ))
+                                  ],
                                 ),
-                                deleteIconColor: Colors.red,
-                                onDeleted: () =>
-                                    _removeListNotifierFileInIndex(index),
                               ),
+
+                              // Chip(
+                              //   padding: const EdgeInsets.symmetric(
+                              //       horizontal: 10, vertical: 20),
+                              //   label: Text(
+                              //     value[index].name,
+                              //     style: const TextStyle(
+                              //       overflow: TextOverflow.ellipsis,
+                              //     ),
+                              //   ),
+                              //   deleteIcon: Container(
+                              //     padding: EdgeInsets.zero,
+                              //     color: Colors.red,
+                              //     child: const Icon(
+                              //       Icons.delete,
+                              //       size: 20,
+                              //     ),
+                              //   ),
+                              //   deleteIconColor: Colors.white,
+                              //   onDeleted: () =>
+                              //       _removeListNotifierFileInIndex(index),
+                              // ),
                             ),
                           ),
                           itemCount: value.length,
