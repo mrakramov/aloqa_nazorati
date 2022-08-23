@@ -1,6 +1,7 @@
 import 'package:aloqa_nazorati/screens/appeals/data/model/AppealResponse.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/regions_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/districts_response_model.dart';
+import 'package:aloqa_nazorati/screens/appeals/data/model/response_file_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/single_appeal_response.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/network/http_client_appeal.dart';
 import 'package:aloqa_nazorati/screens/appeals/domain/appeal_repo.dart';
@@ -19,6 +20,8 @@ class _Urls {
   static String? districts(int? regionId) {
     return '${baseUrl}region/$regionId/districts';
   }
+
+  static const uploadFile = "${baseUrl}profile-update";
 }
 
 class AppealRepository extends AppealRepo {
@@ -42,16 +45,21 @@ class AppealRepository extends AppealRepo {
 
   @override
   Future<AppealCreateResponse> appealSendingMethod(
-      {required AppealRequestData? model, required String? token}) async {
+      {required AppealRequestData model, required String token}) async {
     try {
       final response = await _httpClient.postRequest(
-          path: _Urls.referenceSending, body: model!.toJson(), token: token);
+          path: _Urls.referenceSending, body: model.toJson(), token: token);
       if (kDebugMode) {
         print(response['code']);
       }
-
+      if (kDebugMode) {
+        print(response['status']);
+      }
       return AppealCreateResponse.fromJson(response);
     } catch (e) {
+      if (kDebugMode) {
+        print('KDEBUG MODE');
+      }
       throw ApiExceptionMapper.toErrorMessage(e);
     }
   }
@@ -74,6 +82,20 @@ class AppealRepository extends AppealRepo {
       List response = await _httpClient.getRequest(_Urls.regions, '', false);
       response = response.map((e) => RegionsResponse.fromJson(e)).toList();
       return response.cast<RegionsResponse>();
+    } catch (e) {
+      throw ApiExceptionMapper.toErrorMessage(e);
+    }
+  }
+
+  @override
+  Future<ResponseFileModel> uploadFile(
+      {required String? file, required String? token}) async {
+    try {
+      final Map<String, dynamic> body = {'file': file};
+      var response = await _httpClient.postRequest(
+          path: _Urls.uploadFile, body: body, token: token);
+
+      return ResponseFileModel.fromJson(response);
     } catch (e) {
       throw ApiExceptionMapper.toErrorMessage(e);
     }

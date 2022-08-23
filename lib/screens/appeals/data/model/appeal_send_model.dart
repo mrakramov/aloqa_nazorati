@@ -37,6 +37,9 @@ class AppealRequestData {
     referenceId = json['reference_id'];
     files = json['files[]'].cast<int>();
   }
+  set setFile(List<int>? lt) {
+    files = lt;
+  }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};

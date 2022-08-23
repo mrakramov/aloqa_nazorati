@@ -1,4 +1,5 @@
 import 'package:aloqa_nazorati/screens/appeals/data/model/districts_response_model.dart';
+import 'package:aloqa_nazorati/screens/appeals/data/model/response_file_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/single_appeal_response.dart';
 
 abstract class AppealSendState {
@@ -18,6 +19,11 @@ class DistrictSuccessState extends AppealSendState {
 class SuccessState extends AppealSendState {
   AppealCreateResponse? response;
   SuccessState(this.response);
+}
+
+class FileUploadState extends AppealSendState {
+  List<ResponseFileModel?> file;
+  FileUploadState({required this.file});
 }
 
 class LoadingState extends AppealSendState {

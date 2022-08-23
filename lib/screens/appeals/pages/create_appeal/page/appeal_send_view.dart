@@ -16,6 +16,7 @@ import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/c
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/custom_field_for_district.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/custom_form_field.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/file_add_button.dart';
+import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/file_card_widget.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/lat_widget.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/location_button.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/optional_text.dart';
@@ -33,6 +34,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:aloqa_nazorati/screens/appeals/data/model/response_file_model.dart'
+    as fileMod;
 
 class AppealSendPage extends StatefulWidget {
   final int? referenceParentId;
@@ -60,7 +63,7 @@ class _AppealSendPageState extends State<AppealSendPage> {
   TextEditingController? addressController = TextEditingController();
   late ImagePicker? _imagePicker;
   final Completer<GoogleMapController> _controller = Completer();
-
+  final List<int?> _fileList = [];
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(41.2995, 69.2401),
     zoom: 14.4746,
@@ -128,7 +131,7 @@ class _AppealSendPageState extends State<AppealSendPage> {
     }
   }
 
-  ///pick images from image
+  ///pick images from camera
   void _pickImagesFromCamera() async {
     try {
       final XFile? fileImage =
@@ -136,10 +139,15 @@ class _AppealSendPageState extends State<AppealSendPage> {
 
       if (fileImage != null) {
         _listValueNotifier.value.add(fileImage);
+        _cubit.uploadFile(filePath: fileImage.path);
         setState(() {});
         ToastFlutter.showToast('Rasm saqlandi');
       }
-    } catch (e) {}
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
   }
 
   ///google map diolog
@@ -204,7 +212,7 @@ class _AppealSendPageState extends State<AppealSendPage> {
         await fileRepo.pickFiles(fileTypes: Strings.listFileTypes);
 
     _addResultToRow(result!.files);
-
+    _cubit.uploadFile(filePath: result.files.first.path);
     if (kDebugMode) {
       print(result.files.first.path);
       print(result.count);
@@ -280,12 +288,12 @@ class _AppealSendPageState extends State<AppealSendPage> {
       referenceParentId: widget.referenceParentId,
       ticketRegionId: regionId,
       ticketDistrictId: districtId,
-      phone: userData.mobPhoneNo,
+      phone: '99 830-72-18',
+      // phone: userData.mobPhoneNo,
       firstName: userData.firstName,
       lastName: userData.lastName,
       address: addressController!.text,
       description: murojatController!.text,
-      // files: [12, 34],
     );
     log(requestData.toJson());
     _cubit.appealsUpload(requestData);
@@ -529,53 +537,13 @@ class _AppealSendPageState extends State<AppealSendPage> {
               height: 30,
             ),
 
-            ///list notifier
-            ValueListenableBuilder<List<dynamic>>(
-                valueListenable: _listValueNotifier,
-                builder: (_, value, child) {
-                  if (value.isEmpty) {
+            ///bloc upload data
+            BlocBuilder<AppealSendCubit, AppealSendState>(
+                bloc: _cubit,
+                builder: (context, state) {
+                  if (state is ErrorState) {
                     return const SizedBox.shrink();
-                  } else if (value is PlatformFile) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: SizedBox(
-                        height: 70,
-                        width: _size!.width,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) => AspectRatio(
-                            aspectRatio: 2 / 1.1,
-                            child: Card(
-                              elevation: 0.0,
-                              color: Colors.transparent,
-                              child: Chip(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 20),
-                                label: Text(
-                                  value[index].name,
-                                  style: const TextStyle(
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                deleteIcon: const Padding(
-                                  padding: EdgeInsets.zero,
-                                  child: Icon(
-                                    Icons.delete,
-                                    size: 20,
-                                  ),
-                                ),
-                                deleteIconColor: Colors.red,
-                                onDeleted: () =>
-                                    _removeListNotifierFileInIndex(index),
-                              ),
-                            ),
-                          ),
-                          itemCount: value.length,
-                        ),
-                      ),
-                    );
-                  } else {
+                  } else if (state is FileUploadState) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       child: SizedBox(
@@ -584,62 +552,24 @@ class _AppealSendPageState extends State<AppealSendPage> {
                         child: ListView.builder(
                           shrinkWrap: true,
                           scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) => AspectRatio(
-                            aspectRatio: 2 / 0.9,
-                            child: Card(
-                              elevation: 0.0,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6)),
-                              color: Colors.transparent,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(6),
-                                  color: const Color(0xFFE4E4E4),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 6,
-                                      child: Text(
-                                        value[index].name,
-                                        style: const TextStyle(
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                        flex: 4,
-                                        child: GestureDetector(
-                                          onTap: () =>
-                                              _removeListNotifierFileInIndex(
-                                                  index),
-                                          child: Container(
-                                            height: 50,
-                                            width: 50,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              color: Colors.red,
-                                            ),
-                                            alignment: Alignment.center,
-                                            child: const Icon(
-                                              Icons.delete,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ))
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          itemCount: value.length,
+                          itemBuilder: (context, index) {
+                            fileMod.Data? data = state.file[index]!.data;
+                            return FileCardWidget(
+                                name: data!.name!,
+                                onDelete: () {
+                                  _cubit.removeFile(index: index);
+                                }
+                                // _removeListNotifierFileInIndex(index),
+                                );
+                          },
+                          itemCount: state.file.length,
                         ),
                       ),
                     );
                   }
+                  return const Center(
+                    child: SizedBox.shrink(),
+                  );
                 }),
 
             const SizedBox(
