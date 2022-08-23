@@ -588,7 +588,6 @@ class _AppealSendPageState extends State<AppealSendPage> {
                             aspectRatio: 2 / 0.9,
                             child: Card(
                               elevation: 0.0,
-
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(6)),
                               color: Colors.transparent,
@@ -634,28 +633,6 @@ class _AppealSendPageState extends State<AppealSendPage> {
                                   ],
                                 ),
                               ),
-
-                              // Chip(
-                              //   padding: const EdgeInsets.symmetric(
-                              //       horizontal: 10, vertical: 20),
-                              //   label: Text(
-                              //     value[index].name,
-                              //     style: const TextStyle(
-                              //       overflow: TextOverflow.ellipsis,
-                              //     ),
-                              //   ),
-                              //   deleteIcon: Container(
-                              //     padding: EdgeInsets.zero,
-                              //     color: Colors.red,
-                              //     child: const Icon(
-                              //       Icons.delete,
-                              //       size: 20,
-                              //     ),
-                              //   ),
-                              //   deleteIconColor: Colors.white,
-                              //   onDeleted: () =>
-                              //       _removeListNotifierFileInIndex(index),
-                              // ),
                             ),
                           ),
                           itemCount: value.length,
