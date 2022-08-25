@@ -132,16 +132,16 @@ class _AppealSendPageState extends State<AppealSendPage> {
           maxHeight: 480,
           maxWidth: 640,
           imageQuality: 50);
-
-      if (fileImage != null) {
-        _isLoading = true;
-        setState(() {});
-        _cubit.uploadFile(filePath: fileImage.path).whenComplete(() {
-          _isLoading = false;
-          ToastFlutter.showToast('Rasm saqlandi');
-          setState(() {});
-        });
+      if (fileImage == null) {
+        return;
       }
+      _isLoading = true;
+      setState(() {});
+      _cubit.uploadFile(filePath: fileImage.path).whenComplete(() {
+        _isLoading = false;
+        ToastFlutter.showToast('Rasm saqlandi');
+        setState(() {});
+      });
     } catch (e) {
       if (kDebugMode) {
         print(e);

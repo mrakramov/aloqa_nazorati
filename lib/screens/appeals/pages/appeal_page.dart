@@ -222,6 +222,7 @@ class _AppealPageState extends State<AppealPage>
       child: InkWell(
         borderRadius: BorderRadius.circular(10.0),
         onTap: () {
+          log(data.file);
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => AppealResponsePage(data)));
         },

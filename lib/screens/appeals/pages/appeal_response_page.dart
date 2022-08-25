@@ -1,5 +1,11 @@
 import 'package:aloqa_nazorati/screens/appeals/data/model/AppealResponse.dart';
+import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_list_responses/single_appeal_response_model.dart';
+import 'package:aloqa_nazorati/screens/appeals/data/network/appeal_repository.dart';
+import 'package:aloqa_nazorati/screens/appeals/pages/response_bloc/appeal_response_bloc.dart';
+import 'package:aloqa_nazorati/screens/appeals/pages/response_bloc/appeal_single_response_state.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../utils/utils.dart';
 
@@ -16,11 +22,12 @@ class _AppealResponsePageState extends State<AppealResponsePage>
     with SingleTickerProviderStateMixin {
   int selectedIndex = 0;
   late TabController _tabController;
-
+  final SingleAppealCubit _cubit = SingleAppealCubit(AppealRepository());
   @override
   void initState() {
     super.initState();
     _tabController = TabController(initialIndex: 0, length: 3, vsync: this);
+    _cubit.singleAppeal(Prefs.load('token'), widget.data.code);
   }
 
   @override
@@ -150,6 +157,19 @@ class _AppealResponsePageState extends State<AppealResponsePage>
           const SizedBox(
             height: 10,
           ),
+          BlocBuilder<SingleAppealCubit, AppealSingleResponseState>(
+              bloc: _cubit,
+              builder: (context, state) {
+                if (state is SuccesState) {
+                  return GridButtonsForDownloadFileWidget(
+                    appeal: state.appeal,
+                  );
+                }
+
+                return const Center(
+                  child: CupertinoActivityIndicator(),
+                );
+              }),
           const SizedBox(
             height: 20,
           ),
@@ -421,6 +441,43 @@ class _AppealResponsePageState extends State<AppealResponsePage>
           ),
         ),
       ],
+    );
+  }
+}
+
+class GridButtonsForDownloadFileWidget extends StatelessWidget {
+  final SingleAppealResponseModel? appeal;
+  const GridButtonsForDownloadFileWidget({super.key, required this.appeal});
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          childAspectRatio: 2.1 / 1.1,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 5),
+      shrinkWrap: true,
+      itemCount: appeal!.data!.userFiles!.length,
+      itemBuilder: (context, index) {
+        final file = appeal!.data!.userFiles![index];
+        return Card(
+          child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5)),
+                  side: const BorderSide(
+                    color: ColorsUtils.myColor,
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 10)),
+              onPressed: () {},
+              child: Text(
+                file.fileName!,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: ColorsUtils.myColor),
+              )),
+        );
+      },
     );
   }
 }

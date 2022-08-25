@@ -1,4 +1,5 @@
 import 'package:aloqa_nazorati/screens/appeals/data/model/AppealResponse.dart';
+import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_list_responses/single_appeal_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_response_model_for_create_ticket.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/regions_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/districts_response_model.dart';
@@ -16,6 +17,10 @@ class _Urls {
   static const baseUrl = "https://xn.technocorp.uz/api/";
   static const appeals = "${baseUrl}my-tickets";
   static const referenceSending = "${baseUrl}create-ticket";
+  static String? singleTicket(String? code) {
+    return "${baseUrl}my-ticket/$code";
+  }
+
   static const regions = '${baseUrl}regions';
   static String? districts(int? regionId) {
     return '${baseUrl}region/$regionId/districts';
@@ -101,6 +106,21 @@ class AppealRepository extends AppealRepo {
         print(response);
       }
       return FileUploadResponseModel.fromJson(response);
+    } catch (e) {
+      throw ApiExceptionMapper.toErrorMessage(e);
+    }
+  }
+
+  @override
+  Future<SingleAppealResponseModel> getSingleAppeal(
+      {required String? token, required String? code}) async {
+    try {
+      final Map<String, dynamic> response = await _httpClient.getRequest(
+        _Urls.singleTicket(code)!,
+        token!,
+        true,
+      );
+      return SingleAppealResponseModel.fromJson(response);
     } catch (e) {
       throw ApiExceptionMapper.toErrorMessage(e);
     }
