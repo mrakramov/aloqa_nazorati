@@ -127,8 +127,11 @@ class _AppealSendPageState extends State<AppealSendPage> {
   ///pick images from camera
   void _pickImagesFromCamera() async {
     try {
-      final XFile? fileImage =
-          await _imagePicker!.pickImage(source: ImageSource.camera);
+      final XFile? fileImage = await _imagePicker!.pickImage(
+          source: ImageSource.camera,
+          maxHeight: 480,
+          maxWidth: 640,
+          imageQuality: 50);
 
       if (fileImage != null) {
         _isLoading = true;
