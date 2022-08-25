@@ -56,24 +56,18 @@ class _AppealSendPageState extends State<AppealSendPage> {
   late DistrictsResponse? selectedDistrict;
   bool? districtSelected = false;
   bool? regionSelected = false;
+  bool? _isLoading = false;
   String? hintText = 'Viloyatni tanlang';
   String? hintTextDistrict = "Tumanni tanlang";
-  final _listValueNotifier = ValueNotifier<List<dynamic>>([]);
   TextEditingController? murojatController = TextEditingController();
   TextEditingController? addressController = TextEditingController();
   late ImagePicker? _imagePicker;
   final Completer<GoogleMapController> _controller = Completer();
-  final List<int?> _fileList = [];
+
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(41.2995, 69.2401),
     zoom: 14.4746,
   );
-
-  static const CameraPosition _kLake = CameraPosition(
-      bearing: 192.8334901395799,
-      target: LatLng(37.43296265331129, -122.08832357078792),
-      tilt: 59.440717697143555,
-      zoom: 19.151926040649414);
 
   final _mapMarkerSC = StreamController<List<Marker>>.broadcast();
 
@@ -122,7 +116,6 @@ class _AppealSendPageState extends State<AppealSendPage> {
                   )));
 
       if (fileImage != null) {
-        _listValueNotifier.value.add(fileImage);
         ToastFlutter.showToast('Rasm saqlandi');
       }
       setState(() {});
@@ -138,10 +131,13 @@ class _AppealSendPageState extends State<AppealSendPage> {
           await _imagePicker!.pickImage(source: ImageSource.camera);
 
       if (fileImage != null) {
-        _listValueNotifier.value.add(fileImage);
-        _cubit.uploadFile(filePath: fileImage.path);
+        _isLoading = true;
         setState(() {});
-        ToastFlutter.showToast('Rasm saqlandi');
+        _cubit.uploadFile(filePath: fileImage.path).whenComplete(() {
+          _isLoading = false;
+          ToastFlutter.showToast('Rasm saqlandi');
+          setState(() {});
+        });
       }
     } catch (e) {
       if (kDebugMode) {
@@ -157,51 +153,61 @@ class _AppealSendPageState extends State<AppealSendPage> {
         context: context,
         barrierDismissible: true,
         builder: (context) {
-          return SimpleDialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              children: [
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  child: SizedBox(
-                      height: _size!.height * 0.5,
-                      width: _size!.width,
-                      child: StreamBuilder<List<Marker>>(
-                          stream: _mapMarkerSC.stream,
-                          builder: (context, snapshot) {
-                            return GoogleMap(
-                              mapType: MapType.normal,
-                              markers: _markerList.toSet(),
-                              onTap: (argument) {
-                                final marker = Marker(
-                                    markerId: MarkerId(
-                                        "${argument.longitude}+${argument.longitude}"),
-                                    position: LatLng(
-                                        argument.latitude, argument.longitude));
-                                _markerList.add(marker);
-                                _mapMarkerSink.add(_markerList);
-                                setState(() {});
-                              },
-                              initialCameraPosition: _kGooglePlex,
-                              onMapCreated: (GoogleMapController controller) {
-                                if (!_controller.isCompleted) {
-                                  _controller.complete(controller);
-                                }
-                              },
-                            );
-                          })),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: CupertinoButton(
-                      color: ColorsUtils.myColor,
-                      child: const Text('Tanlash'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      }),
-                )
-              ]);
+          return SimpleDialog(contentPadding: EdgeInsets.zero, children: [
+            SizedBox(
+                height: _size!.height * 0.5,
+                width: _size!.width,
+                child: StreamBuilder<List<Marker>>(
+                    stream: _mapMarkerSC.stream,
+                    builder: (context, snapshot) {
+                      return GoogleMap(
+                        mapType: MapType.normal,
+                        markers: _markerList.toSet(),
+                        onTap: (argument) {
+                          final marker = Marker(
+                              markerId: MarkerId(
+                                  "${argument.longitude}+${argument.longitude}"),
+                              position: LatLng(
+                                  argument.latitude, argument.longitude));
+                          _markerList.add(marker);
+                          _mapMarkerSink.add(_markerList);
+                          setState(() {});
+                        },
+                        initialCameraPosition: _kGooglePlex,
+                        onMapCreated: (GoogleMapController controller) {
+                          if (!_controller.isCompleted) {
+                            _controller.complete(controller);
+                          }
+                        },
+                      );
+                    })),
+            const SizedBox(
+              height: 5,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: _size!.width * 0.25),
+              child: SizedBox(
+                height: 50,
+                child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                        side: const BorderSide(
+                            width: 1, color: ColorsUtils.buttonColor),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8))),
+                    child: const Text(
+                      'Tanlash',
+                      style: TextStyle(
+                          color: ColorsUtils.myColor, letterSpacing: 1.5),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    }),
+              ),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+          ]);
         });
   }
 
@@ -210,7 +216,16 @@ class _AppealSendPageState extends State<AppealSendPage> {
     final fileRepo = serviceLocator.get<FileRepo>();
     FilePickerResult? result =
         await fileRepo.pickFiles(fileTypes: Strings.listFileTypes);
-    _cubit.uploadFile(filePath: result!.files.first.path);
+    if (result == null) {
+      return;
+    }
+    _isLoading = true;
+    setState(() {});
+    _cubit.uploadFile(filePath: result.files.first.path).whenComplete(() {
+      _isLoading = false;
+      ToastFlutter.showToast('Rasm saqlandi');
+      setState(() {});
+    });
     if (kDebugMode) {
       print(result.files.first.path);
       print(result.count);
@@ -279,7 +294,8 @@ class _AppealSendPageState extends State<AppealSendPage> {
       description: murojatController!.text,
     );
     log(requestData.toJson());
-    _cubit.appealsUpload(requestData);
+    // ignore: use_build_context_synchronously
+    _cubit.appealsUpload(requestData, context);
   }
 
   @override
@@ -310,270 +326,300 @@ class _AppealSendPageState extends State<AppealSendPage> {
   ///page body
   Widget get getBody {
     return SafeArea(
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(
-            parent: AlwaysScrollableScrollPhysics()),
-        child: Column(
-          children: [
-            ///text
-            Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, top: 20),
-              child: SizedBox(
-                width: _size!.width,
-                child: Text(
-                  'Murojaatingzni toliq tushuntiring',
-                  textAlign: TextAlign.start,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.black,
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.w500,
+      child: Stack(
+        children: [
+          Builder(builder: (context) {
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics()),
+              child: Column(
+                children: [
+                  ///text
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 15, right: 15, top: 20),
+                    child: SizedBox(
+                      width: _size!.width,
+                      child: Text(
+                        'Murojaatingzni toliq tushuntiring',
+                        textAlign: TextAlign.start,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: Colors.black,
+                                  fontFamily: 'Roboto',
+                                  fontWeight: FontWeight.w500,
+                                ),
                       ),
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 15,
+                  ),
+
+                  ///Regions from hive database
+                  FutureBuilder<List<Map<String, dynamic>>>(
+                      future: Future(() => serviceLocator
+                          .get<HiveDB>()
+                          .box
+                          .get(Strings.regionsDataKey)),
+                      builder: (context, snapshot) {
+                        List<DropdownMenuItem<int>> data = [];
+                        if (snapshot.hasError) {
+                          return const Center(
+                            child: CupertinoActivityIndicator(),
+                          );
+                        } else if (!snapshot.hasData) {
+                          return const Center(
+                            child: CupertinoActivityIndicator(),
+                          );
+                        }
+
+                        if (snapshot.data!.isNotEmpty) {
+                          List<RegionsResponse?>? dataResponse = snapshot.data!
+                              .map((e) => RegionsResponse.fromJson(e))
+                              .toList();
+                          data.clear();
+                          for (var item in dataResponse) {
+                            data.add(DropdownMenuItem(
+                                value: item!.id!,
+                                child: Text(item.name!.oz!.toString())));
+                          }
+
+                          if (dataResponse.isEmpty) {
+                            return const Center(
+                                child: CupertinoActivityIndicator());
+                          }
+                          return CustomFieldForRegions(
+                              prefix: DropdownButton<int?>(
+                                  isExpanded: true,
+                                  value: regionId!,
+                                  isDense: true,
+                                  icon: const SizedBox.shrink(),
+                                  underline: const SizedBox.shrink(),
+                                  items: data,
+                                  onChanged: (value) {
+                                    _onChangeRegions(value, dataResponse);
+                                  }),
+                              hintText: hintText);
+                        }
+                        return const Center(
+                          child: CupertinoActivityIndicator(),
+                        );
+                      }),
+
+                  const SizedBox(
+                    height: 15,
+                  ),
+
+                  ///districts from state
+                  BlocBuilder<AppealSendCubit, AppealSendState>(
+                      bloc: _cubit,
+                      builder: (context, state) {
+                        if (state is DistrictSuccessState &&
+                            state.districts.isNotEmpty) {
+                          districtId = state.currentDistrict!.id;
+                          List<DropdownMenuItem<int>> data = [];
+                          for (var item in state.districts) {
+                            data.add(DropdownMenuItem(
+                                value: item.id,
+                                child: Text(item.name!.oz!.toString())));
+                          }
+
+                          if (state.districts.isEmpty) {
+                            return const CupertinoActivityIndicator();
+                          }
+                          return IgnorePointer(
+                            ignoring: !regionSelected!,
+                            child: CustomFieldForRegions(
+                                prefix: DropdownButton<int?>(
+                                    isExpanded: true,
+                                    value: districtId!,
+                                    isDense: true,
+                                    icon: const SizedBox.shrink(),
+                                    underline: const SizedBox.shrink(),
+                                    items: data,
+                                    onChanged: (value) {
+                                      _onChangeDistricts(value, state);
+                                    }),
+                                hintText: hintTextDistrict),
+                          );
+                        }
+                        return const Center(
+                          child: CupertinoActivityIndicator(),
+                        );
+                      }),
+
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: TextField(
+                      controller: addressController,
+                      decoration: const InputDecoration(
+                          // hintText: 'Manzilni kiriting',
+                          labelText: 'Manzilni kiriting',
+                          floatingLabelBehavior: FloatingLabelBehavior.auto,
+                          border: OutlineInputBorder()),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+
+                  ///location button
+                  Builder(builder: (context) {
+                    return LocationButton(
+                      size: _size,
+                      text: "Lokatsiyani belgilash",
+                      callBack: _showDialogGoogleMap,
+                    );
+                  }),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  OptionalText(
+                      context: context, text: "(Loksiya belgilash ixtiyoriy)"),
+
+                  ///longtitude
+                  if (_markerList.isNotEmpty)
+                    const SizedBox(
+                      height: 15,
+                    ),
+
+                  ///latitude
+                  if (_markerList.isNotEmpty)
+                    LatWidget(
+                      addressController: TextEditingController(),
+                      labelText: _markerList.first.position.latitude.toString(),
+                      hintText: 'Lat',
+                    ),
+
+                  ///longtitude
+                  if (_markerList.isNotEmpty)
+                    const SizedBox(
+                      height: 15,
+                    ),
+
+                  ///longtitude
+                  if (_markerList.isNotEmpty)
+                    LatWidget(
+                      addressController: TextEditingController(),
+                      labelText:
+                          _markerList.first.position.longitude.toString(),
+                      hintText: 'Lng',
+                    ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+
+                  ///Murojat matni
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: CustomFormField(
+                      size: _size,
+                      text: 'Murojat matni',
+                      keyForm: key,
+                      controller: murojatController,
+                    ),
+                  ),
+
+                  ///file add button
+                  FileAddButtonAndCamera(
+                    context: context,
+                    callBackForCamera: _pickImagesFromCamera,
+                    callBackForFile: _fileAddButtonCallBack,
+                    text: "Fayl biriktirish",
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+
+                  ///optional text
+                  OptionalText(
+                      context: context,
+                      text: "(pdf,doc,docx,xls,jpg,jpeg,png)"),
+                  const SizedBox(
+                    height: 30,
+                  ),
+
+                  ///bloc upload data
+                  BlocBuilder<AppealSendCubit, AppealSendState>(
+                      bloc: _cubit,
+                      builder: (context, state) {
+                        if (state is ErrorState) {
+                          return const SizedBox.shrink();
+                        } else if (state is FileUploadState) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: SizedBox(
+                              height: 50,
+                              width: _size!.width,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, index) {
+                                  fileMod.Data? data = state.file[index]!.data;
+                                  return FileCardWidget(
+                                      name: data!.file!,
+                                      onDelete: () {
+                                        _cubit.removeFile(index: index);
+                                      });
+                                },
+                                itemCount: state.file.length,
+                              ),
+                            ),
+                          );
+                        }
+                        return const Center(
+                          child: SizedBox.shrink(),
+                        );
+                      }),
+
+                  const SizedBox(
+                    height: 30,
+                  ),
+
+                  ///Yuborish button
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: _size!.width * 0.05),
+                    child: CustomButton(
+                      size: _size,
+                      context: context,
+                      text: "Yuborish",
+                      callback: _sendingAppeal,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                ],
+              ),
+            );
+          }),
+          if (_isLoading!)
+            Container(
+              height: _size!.height,
+              width: _size!.width,
+              color: Colors.grey.withOpacity(0.7),
+              child: const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Card(
+                    elevation: .0,
+                    margin: EdgeInsets.zero,
+                    child: ListTile(
+                      tileColor: Colors.white,
+                      leading: CircularProgressIndicator(),
+                      title: Text('Yuklanmoqda'),
+                    ),
+                  ),
                 ),
               ),
-            ),
-
-            const SizedBox(
-              height: 15,
-            ),
-
-            ///Regions from hive database
-            FutureBuilder<List<Map<String, dynamic>>>(
-                future: Future(() => serviceLocator
-                    .get<HiveDB>()
-                    .box
-                    .get(Strings.regionsDataKey)),
-                builder: (context, snapshot) {
-                  List<DropdownMenuItem<int>> data = [];
-                  if (snapshot.hasError) {
-                    return const Center(
-                      child: CupertinoActivityIndicator(),
-                    );
-                  } else if (!snapshot.hasData) {
-                    return const Center(
-                      child: CupertinoActivityIndicator(),
-                    );
-                  }
-
-                  if (snapshot.data!.isNotEmpty) {
-                    List<RegionsResponse?>? dataResponse = snapshot.data!
-                        .map((e) => RegionsResponse.fromJson(e))
-                        .toList();
-                    data.clear();
-                    for (var item in dataResponse) {
-                      data.add(DropdownMenuItem(
-                          value: item!.id!,
-                          child: Text(item.name!.oz!.toString())));
-                    }
-
-                    if (dataResponse.isEmpty) {
-                      return const Center(child: CupertinoActivityIndicator());
-                    }
-                    return CustomFieldForRegions(
-                        prefix: DropdownButton<int?>(
-                            isExpanded: true,
-                            value: regionId!,
-                            isDense: true,
-                            icon: const SizedBox.shrink(),
-                            underline: const SizedBox.shrink(),
-                            items: data,
-                            onChanged: (value) {
-                              _onChangeRegions(value, dataResponse);
-                            }),
-                        hintText: hintText);
-                  }
-                  return const Center(
-                    child: CupertinoActivityIndicator(),
-                  );
-                }),
-
-            const SizedBox(
-              height: 15,
-            ),
-
-            ///districts from state
-            BlocBuilder<AppealSendCubit, AppealSendState>(
-                bloc: _cubit,
-                builder: (context, state) {
-                  if (state is DistrictSuccessState &&
-                      state.districts.isNotEmpty) {
-                    districtId = state.currentDistrict!.id;
-                    List<DropdownMenuItem<int>> data = [];
-                    for (var item in state.districts) {
-                      data.add(DropdownMenuItem(
-                          value: item.id,
-                          child: Text(item.name!.oz!.toString())));
-                    }
-
-                    if (state.districts.isEmpty) {
-                      return const CupertinoActivityIndicator();
-                    }
-                    return IgnorePointer(
-                      ignoring: !regionSelected!,
-                      child: CustomFieldForRegions(
-                          prefix: DropdownButton<int?>(
-                              isExpanded: true,
-                              value: districtId!,
-                              isDense: true,
-                              icon: const SizedBox.shrink(),
-                              underline: const SizedBox.shrink(),
-                              items: data,
-                              onChanged: (value) {
-                                _onChangeDistricts(value, state);
-                              }),
-                          hintText: hintTextDistrict),
-                    );
-                  }
-                  return const Center(
-                    child: CupertinoActivityIndicator(),
-                  );
-                }),
-
-            const SizedBox(
-              height: 15,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: TextField(
-                controller: addressController,
-                decoration: const InputDecoration(
-                    // hintText: 'Manzilni kiriting',
-                    labelText: 'Manzilni kiriting',
-                    floatingLabelBehavior: FloatingLabelBehavior.auto,
-                    border: OutlineInputBorder()),
-              ),
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-
-            ///location button
-            Builder(builder: (context) {
-              return LocationButton(
-                size: _size,
-                text: "Lokatsiyani belgilash",
-                callBack: _showDialogGoogleMap,
-              );
-            }),
-            const SizedBox(
-              height: 5,
-            ),
-            OptionalText(
-                context: context, text: "(Loksiya belgilash ixtiyoriy)"),
-
-            ///longtitude
-            if (_markerList.isNotEmpty)
-              const SizedBox(
-                height: 15,
-              ),
-
-            ///latitude
-            if (_markerList.isNotEmpty)
-              LatWidget(
-                addressController: TextEditingController(),
-                labelText: _markerList.first.position.latitude.toString(),
-                hintText: 'Lat',
-              ),
-
-            ///longtitude
-            if (_markerList.isNotEmpty)
-              const SizedBox(
-                height: 15,
-              ),
-
-            ///longtitude
-            if (_markerList.isNotEmpty)
-              LatWidget(
-                addressController: TextEditingController(),
-                labelText: _markerList.first.position.longitude.toString(),
-                hintText: 'Lng',
-              ),
-            const SizedBox(
-              height: 15,
-            ),
-
-            ///Murojat matni
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: CustomFormField(
-                size: _size,
-                text: 'Murojat matni',
-                keyForm: key,
-                controller: murojatController,
-              ),
-            ),
-
-            ///common button
-            FileAddButtonAndCamera(
-              context: context,
-              callBackForCamera: _pickImagesFromCamera,
-              callBackForFile: _fileAddButtonCallBack,
-              text: "Fayl biriktirish",
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-
-            ///optional text
-            OptionalText(
-                context: context, text: "(pdf,doc,docx,xls,jpg,jpeg,png)"),
-            const SizedBox(
-              height: 30,
-            ),
-
-            ///bloc upload data
-            BlocBuilder<AppealSendCubit, AppealSendState>(
-                bloc: _cubit,
-                builder: (context, state) {
-                  if (state is ErrorState) {
-                    return const SizedBox.shrink();
-                  } else if (state is FileUploadState) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: SizedBox(
-                        height: 50,
-                        width: _size!.width,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) {
-                            fileMod.Data? data = state.file[index]!.data;
-                            return FileCardWidget(
-                                name: data!.file!,
-                                onDelete: () {
-                                  _cubit.removeFile(index: index);
-                                }
-                                // _removeListNotifierFileInIndex(index),
-                                );
-                          },
-                          itemCount: state.file.length,
-                        ),
-                      ),
-                    );
-                  }
-                  return const Center(
-                    child: SizedBox.shrink(),
-                  );
-                }),
-
-            const SizedBox(
-              height: 30,
-            ),
-
-            ///Yuborish button
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: _size!.width * 0.05),
-              child: CustomButton(
-                size: _size,
-                context: context,
-                text: "Yuborish",
-                callback: _sendingAppeal,
-              ),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-          ],
-        ),
+            )
+        ],
       ),
     );
   }

@@ -128,7 +128,7 @@ class HttpClientAppeal {
       required String? token}) async {
     Response response;
     try {
-      response = await _dio.postUri(Uri.tryParse(url!)!,
+      response = await _dio.postUri<Map<String, dynamic>>(Uri.tryParse(url!)!,
           data: body,
           options: Options(headers: {"Authorization": "Bearer $token"}));
       final statusCode = response.statusCode;
@@ -136,6 +136,9 @@ class HttpClientAppeal {
         if (response.data.isEmpty) {
           return <dynamic>[];
         } else {
+          if (kDebugMode) {
+            print('http ::::---> $response');
+          }
           return response.data;
         }
       } else if (statusCode >= 400 && statusCode < 500) {

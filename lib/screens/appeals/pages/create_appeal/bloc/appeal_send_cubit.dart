@@ -4,6 +4,7 @@ import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_send_model.dart
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/appeal_send_state.dart';
 import 'package:aloqa_nazorati/utils/utils.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -28,7 +29,7 @@ class AppealSendCubit extends Cubit<AppealSendState> {
     }
   }
 
-  void appealsUpload(AppealRequestData? appeal) async {
+  void appealsUpload(AppealRequestData? appeal, BuildContext context) async {
     if (kDebugMode) {
       print(await Prefs.load("token"));
     }
@@ -43,12 +44,48 @@ class AppealSendCubit extends Cubit<AppealSendState> {
       final response =
           await repository.appealSendingMethod(model: appeal, token: token);
       if (kDebugMode) {
-        print(response.data.firstName);
+        print("APPEAL:${response.data}");
       }
-      _listFile.clear();
-      emit(LoadingState(false));
-      emit(FileUploadState(file: []));
-      emit(SuccessState(response));
+      if (response.data!.isSend!) {
+        _listFile.clear();
+        emit(LoadingState(false));
+        emit(FileUploadState(file: []));
+        emit(SuccessState(response));
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text(
+              'Murojat xolati',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: const Card(
+              elevation: .0,
+              child: Text(
+                'Sizning murojatingiz muvofaqqiyatli ravishda tizimga yuborildi',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                      ..pop()
+                      ..pop();
+                  },
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(color: ColorsUtils.myColor),
+                  ))
+            ],
+          ),
+        );
+      }
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -58,7 +95,7 @@ class AppealSendCubit extends Cubit<AppealSendState> {
     }
   }
 
-  void uploadFile({required String? filePath}) async {
+  Future<void> uploadFile({required String? filePath}) async {
     try {
       emit(LoadingState(true));
       var token = await Prefs.load("token");

@@ -1,6 +1,6 @@
+import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_response_model_for_create_ticket.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/districts_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/response_file_model.dart';
-import 'package:aloqa_nazorati/screens/appeals/data/model/single_appeal_response.dart';
 
 abstract class AppealSendState {
   AppealSendState();
@@ -17,7 +17,7 @@ class DistrictSuccessState extends AppealSendState {
 }
 
 class SuccessState extends AppealSendState {
-  AppealCreateResponse? response;
+  AppealResponseModelForCreateTicket? response;
   SuccessState(this.response);
 }
 
