@@ -22,7 +22,7 @@ class SuccessState extends AppealSendState {
 }
 
 class FileUploadState extends AppealSendState {
-  List<ResponseFileModel?> file;
+  List<FileUploadResponseModel?> file;
   FileUploadState({required this.file});
 }
 

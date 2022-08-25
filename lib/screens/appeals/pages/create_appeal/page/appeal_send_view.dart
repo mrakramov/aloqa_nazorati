@@ -210,27 +210,11 @@ class _AppealSendPageState extends State<AppealSendPage> {
     final fileRepo = serviceLocator.get<FileRepo>();
     FilePickerResult? result =
         await fileRepo.pickFiles(fileTypes: Strings.listFileTypes);
-
-    _addResultToRow(result!.files);
-    _cubit.uploadFile(filePath: result.files.first.path);
+    _cubit.uploadFile(filePath: result!.files.first.path);
     if (kDebugMode) {
       print(result.files.first.path);
       print(result.count);
       print(await Prefs.load('token'));
-    }
-  }
-
-  ///add platform results to notifier
-  void _addResultToRow(List<PlatformFile> list) {
-    _listValueNotifier.value.addAll(list);
-    setState(() {});
-  }
-
-  ///remove file in index
-  void _removeListNotifierFileInIndex(int? index) {
-    if (_listValueNotifier.value.isNotEmpty) {
-      _listValueNotifier.value.removeAt(index!);
-      setState(() {});
     }
   }
 
@@ -288,8 +272,7 @@ class _AppealSendPageState extends State<AppealSendPage> {
       referenceParentId: widget.referenceParentId,
       ticketRegionId: regionId,
       ticketDistrictId: districtId,
-      phone: '99 830-72-18',
-      // phone: userData.mobPhoneNo,
+      phone: userData.mobPhoneNo,
       firstName: userData.firstName,
       lastName: userData.lastName,
       address: addressController!.text,
@@ -555,7 +538,7 @@ class _AppealSendPageState extends State<AppealSendPage> {
                           itemBuilder: (context, index) {
                             fileMod.Data? data = state.file[index]!.data;
                             return FileCardWidget(
-                                name: data!.name!,
+                                name: data!.file!,
                                 onDelete: () {
                                   _cubit.removeFile(index: index);
                                 }

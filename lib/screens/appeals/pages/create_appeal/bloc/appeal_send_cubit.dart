@@ -9,7 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AppealSendCubit extends Cubit<AppealSendState> {
   AppealRepository repository;
-  final List<ResponseFileModel?> _listFile = [];
+  final List<FileUploadResponseModel?> _listFile = [];
   AppealSendCubit(this.repository) : super(InitialState());
 
   void getDistricts(int? regionId) async {
@@ -47,7 +47,7 @@ class AppealSendCubit extends Cubit<AppealSendState> {
       }
       _listFile.clear();
       emit(LoadingState(false));
-      emit(FileUploadState(file: _listFile));
+      emit(FileUploadState(file: []));
       emit(SuccessState(response));
     } catch (e) {
       if (kDebugMode) {

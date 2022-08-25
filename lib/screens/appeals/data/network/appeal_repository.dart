@@ -21,7 +21,7 @@ class _Urls {
     return '${baseUrl}region/$regionId/districts';
   }
 
-  static const uploadFile = "${baseUrl}profile-update";
+  static const uploadFile = "${baseUrl}file-upload";
 }
 
 class AppealRepository extends AppealRepo {
@@ -47,13 +47,17 @@ class AppealRepository extends AppealRepo {
   Future<AppealCreateResponse> appealSendingMethod(
       {required AppealRequestData model, required String token}) async {
     try {
-      final response = await _httpClient.postRequest(
-          path: _Urls.referenceSending, body: model.toJson(), token: token);
+      final response = await _httpClient.postRequestDio(
+        url: _Urls.referenceSending,
+        body: model.toJson(),
+        token: token,
+      );
       if (kDebugMode) {
         print(response['code']);
       }
       if (kDebugMode) {
         print(response['status']);
+        print(response['data']);
       }
       return AppealCreateResponse.fromJson(response);
     } catch (e) {
@@ -88,14 +92,15 @@ class AppealRepository extends AppealRepo {
   }
 
   @override
-  Future<ResponseFileModel> uploadFile(
+  Future<FileUploadResponseModel> uploadFile(
       {required String? file, required String? token}) async {
     try {
-      final Map<String, dynamic> body = {'file': file};
-      var response = await _httpClient.postRequest(
-          path: _Urls.uploadFile, body: body, token: token);
-
-      return ResponseFileModel.fromJson(response);
+      var response = await _httpClient.fileUploadPostResponse(
+          url: _Urls.uploadFile, path: file, token: token);
+      if (kDebugMode) {
+        print(response);
+      }
+      return FileUploadResponseModel.fromJson(response);
     } catch (e) {
       throw ApiExceptionMapper.toErrorMessage(e);
     }

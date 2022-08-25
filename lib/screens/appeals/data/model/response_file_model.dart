@@ -1,14 +1,16 @@
-class ResponseFileModel {
+class FileUploadResponseModel {
   String? status;
   String? code;
   Data? data;
+  String? message;
 
-  ResponseFileModel({this.status, this.code, this.data});
+  FileUploadResponseModel({this.status, this.code, this.data, this.message});
 
-  ResponseFileModel.fromJson(Map<String, dynamic> json) {
+  FileUploadResponseModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     code = json['code'];
     data = json['data'] != null ? Data.fromJson(json['data']) : null;
+    message = json['message'];
   }
 
   Map<String, dynamic> toJson() {
@@ -18,119 +20,52 @@ class ResponseFileModel {
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
+    data['message'] = message;
     return data;
   }
 }
 
 class Data {
-  int? id;
-  String? name;
-  String? email;
-  String? emailVerifiedAt;
-  String? createdAt;
+  int? userId;
+  String? file;
+  String? fileName;
+  String? filePath;
+  String? fileExtension;
   String? updatedAt;
-  String? firstName;
-  String? lastName;
-  dynamic phone;
-  dynamic code;
-  String? codeVerifiedAt;
-  bool? isVerified;
-  String? deletedAt;
-  String? photo;
-  String? birthDate;
-  String? citizen;
-  String? address;
-  String? mobPhoneNo;
-  String? birthPlace;
-  String? midName;
-  String? userType;
-  String? sessId;
-  String? retCd;
-  bool? isOneId;
-  String? oneIdCode;
+  String? createdAt;
+  int? id;
 
   Data(
-      {this.id,
-      this.name,
-      this.email,
-      this.emailVerifiedAt,
-      this.createdAt,
+      {this.userId,
+      this.file,
+      this.fileName,
+      this.filePath,
+      this.fileExtension,
       this.updatedAt,
-      this.firstName,
-      this.lastName,
-      this.phone,
-      this.code,
-      this.codeVerifiedAt,
-      this.isVerified,
-      this.deletedAt,
-      this.photo,
-      this.birthDate,
-      this.citizen,
-      this.address,
-      this.mobPhoneNo,
-      this.birthPlace,
-      this.midName,
-      this.userType,
-      this.sessId,
-      this.retCd,
-      this.isOneId,
-      this.oneIdCode});
+      this.createdAt,
+      this.id});
 
   Data.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    email = json['email'];
-    emailVerifiedAt = json['email_verified_at'];
-    createdAt = json['created_at'];
+    userId = json['user_id'];
+    file = json['file'];
+    fileName = json['file_name'];
+    filePath = json['file_path'];
+    fileExtension = json['file_extension'];
     updatedAt = json['updated_at'];
-    firstName = json['first_name'];
-    lastName = json['last_name'];
-    phone = json['phone'];
-    code = json['code'];
-    codeVerifiedAt = json['code_verified_at'];
-    isVerified = json['is_verified'];
-    deletedAt = json['deleted_at'];
-    photo = json['photo'];
-    birthDate = json['birth_date'];
-    citizen = json['citizen'];
-    address = json['address'];
-    mobPhoneNo = json['mob_phone_no'];
-    birthPlace = json['birth_place'];
-    midName = json['mid_name'];
-    userType = json['user_type'];
-    sessId = json['sess_id'];
-    retCd = json['ret_cd'];
-    isOneId = json['is_one_id'];
-    oneIdCode = json['one_id_code'];
+    createdAt = json['created_at'];
+    id = json['id'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['name'] = name;
-    data['email'] = email;
-    data['email_verified_at'] = emailVerifiedAt;
-    data['created_at'] = createdAt;
+    data['user_id'] = userId;
+    data['file'] = file;
+    data['file_name'] = fileName;
+    data['file_path'] = filePath;
+    data['file_extension'] = fileExtension;
     data['updated_at'] = updatedAt;
-    data['first_name'] = firstName;
-    data['last_name'] = lastName;
-    data['phone'] = phone;
-    data['code'] = code;
-    data['code_verified_at'] = codeVerifiedAt;
-    data['is_verified'] = isVerified;
-    data['deleted_at'] = deletedAt;
-    data['photo'] = photo;
-    data['birth_date'] = birthDate;
-    data['citizen'] = citizen;
-    data['address'] = address;
-    data['mob_phone_no'] = mobPhoneNo;
-    data['birth_place'] = birthPlace;
-    data['mid_name'] = midName;
-    data['user_type'] = userType;
-    data['sess_id'] = sessId;
-    data['ret_cd'] = retCd;
-    data['is_one_id'] = isOneId;
-    data['one_id_code'] = oneIdCode;
+    data['created_at'] = createdAt;
+    data['id'] = id;
     return data;
   }
 }
