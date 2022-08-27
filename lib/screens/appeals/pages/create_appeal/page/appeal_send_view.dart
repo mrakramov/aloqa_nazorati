@@ -4,12 +4,10 @@ Created by Axmadjon Isaqov on 22:08:06 04.08.2022
 */
 import 'dart:async';
 import 'dart:convert';
-import 'package:aloqa_nazorati/main.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_send_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/districts_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/regions_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/network/appeal_repository.dart';
-import 'package:aloqa_nazorati/screens/appeals/pages/camera/camera_page.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/appeal_send_cubit.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/bloc/appeal_send_state.dart';
 import 'package:aloqa_nazorati/screens/appeals/pages/create_appeal/page/widget/custom_button.dart';
@@ -106,18 +104,18 @@ class _AppealSendPageState extends State<AppealSendPage> {
     try {
       final cameraPermisson = await Permission.camera.request();
       if (cameraPermisson == PermissionStatus.denied) return;
-      final firstCamera = cameraList!.first;
+      // final firstCamera = cameraList!.first;
       // ignore: use_build_context_synchronously
-      final XFile? fileImage = await Navigator.push(
-          context,
-          CupertinoPageRoute(
-              builder: (context) => CameraPage(
-                    description: firstCamera,
-                  )));
+      // final XFile? fileImage = await Navigator.push(
+      //     context,
+      //     CupertinoPageRoute(
+      //         builder: (context) => CameraPage(
+      //               description: firstCamera,
+      //             )));
 
-      if (fileImage != null) {
-        ToastFlutter.showToast('Rasm saqlandi');
-      }
+      // if (fileImage != null) {
+      //   ToastFlutter.showToast('Rasm saqlandi');
+      // }
       setState(() {});
     } catch (e) {
       log(e);

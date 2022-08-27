@@ -18,7 +18,7 @@ class HttpClientAppeal {
   }
   final Dio _dio = Dio(BaseOptions(headers: {
     "mobile-app-key": Strings.webApiKey,
-  }));
+  }, connectTimeout: 5000, receiveTimeout: 5000));
   Future<dynamic> getRequest(
     String path,
     String token,
