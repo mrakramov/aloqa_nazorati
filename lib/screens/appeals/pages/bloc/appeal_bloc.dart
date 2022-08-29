@@ -18,7 +18,7 @@ class AppealBloc extends Cubit<AppealState> {
       var result = await repository.appeals(
         t,
       );
-      log("DATAAA::$result");
+      log("DATAAA::${result.data}");
       if (result.data!.isNotEmpty) {
         emit(UploadingState(false));
         emit(SuccessState(result));
