@@ -314,7 +314,7 @@ class _AppealResponsePageState extends State<AppealResponsePage>
               height: 10,
             ),
             Text(
-              widget.data.deletedAt.toString(),
+              widget.data.deletedAt ?? '-',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: Colors.black,
                     fontFamily: 'Roboto',
