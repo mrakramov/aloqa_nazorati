@@ -44,6 +44,25 @@ class Strings {
   ];
 }
 
+class NumberUtil {
+  static String? getSortedPhoneNumber(String s) {
+    s = s.substring(4);
+
+    var newNum = '';
+    for (var i = 0; i < s.length; i++) {
+      if (i == 2) {
+        newNum += ' ';
+      }
+
+      if (i == 5 || i == 7) {
+        newNum += '-';
+      }
+      newNum += s[i];
+    }
+    return newNum;
+  }
+}
+
 class ColorsUtils {
   static const myColor = Color.fromRGBO(68, 30, 221, 1);
   static const Color buttonColor = Color(0xFF504aba);

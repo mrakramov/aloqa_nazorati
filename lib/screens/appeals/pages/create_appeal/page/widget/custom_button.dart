@@ -7,10 +7,12 @@ class CustomButton extends StatelessWidget {
     required Size? size,
     required this.context,
     required this.text,
+    required this.isLoading,
     required this.callback,
   }) : _size = size;
 
   final Size? _size;
+  final bool? isLoading;
   final BuildContext context;
   final String? text;
   final VoidCallback? callback;
@@ -21,16 +23,20 @@ class CustomButton extends StatelessWidget {
       height: 70,
       width: _size!.width,
       child: ElevatedButton(
-        onPressed: callback,
+        onPressed: !isLoading! ? callback : null,
         style: ElevatedButton.styleFrom(
             primary: ColorsUtils.myColor,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(50))),
-        child: Text(
-          text!,
-          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-              color: Colors.white, fontSize: 20, fontWeight: FontWeight.w500),
-        ),
+        child: isLoading!
+            ? const CircularProgressIndicator()
+            : Text(
+                text!,
+                style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500),
+              ),
       ),
     );
   }

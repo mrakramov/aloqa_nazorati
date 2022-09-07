@@ -55,6 +55,7 @@ class _AppealSendPageState extends State<AppealSendPage> {
   bool? districtSelected = false;
   bool? regionSelected = false;
   bool? _isLoading = false;
+  bool? isLoadingButton = false;
   String? hintText = 'Viloyatni tanlang';
   String? hintTextDistrict = "Tumanni tanlang";
   TextEditingController? murojatController = TextEditingController();
@@ -135,10 +136,12 @@ class _AppealSendPageState extends State<AppealSendPage> {
       }
       _isLoading = true;
       setState(() {});
-      _cubit.uploadFile(filePath: fileImage.path).whenComplete(() {
+      await _cubit.uploadFile(filePath: fileImage.path).then((value) {
         _isLoading = false;
         ToastFlutter.showToast('Rasm saqlandi');
         setState(() {});
+      }).onError((error, stackTrace) {
+        ToastFlutter.showToast('Xatolik sodir bo\'ldi');
       });
     } catch (e) {
       if (kDebugMode) {
@@ -222,10 +225,12 @@ class _AppealSendPageState extends State<AppealSendPage> {
     }
     _isLoading = true;
     setState(() {});
-    _cubit.uploadFile(filePath: result.files.first.path).whenComplete(() {
+    await _cubit.uploadFile(filePath: result.files.first.path).then((value) {
       _isLoading = false;
       ToastFlutter.showToast('Rasm saqlandi');
       setState(() {});
+    }).onError((error, stackTrace) {
+      ToastFlutter.showToast('Xatolik sodir bo\'ldi');
     });
     if (kDebugMode) {
       print(result.files.first.path);
@@ -280,7 +285,8 @@ class _AppealSendPageState extends State<AppealSendPage> {
       ToastFlutter.showToast('Malumotlar toliq emas');
       return;
     }
-
+    isLoadingButton = true;
+    setState(() {});
     Data? userData = Data.fromJson(jsonDecode(await Prefs.load('userData')));
     AppealRequestData? requestData = AppealRequestData(
       letterId: 1,
@@ -288,7 +294,7 @@ class _AppealSendPageState extends State<AppealSendPage> {
       referenceParentId: widget.referenceParentId,
       ticketRegionId: regionId,
       ticketDistrictId: districtId,
-      phone: userData.mobPhoneNo,
+      phone: NumberUtil.getSortedPhoneNumber(userData.mobPhoneNo!),
       firstName: userData.firstName,
       lastName: userData.lastName,
       address: addressController!.text,
@@ -297,6 +303,8 @@ class _AppealSendPageState extends State<AppealSendPage> {
     log(requestData.toJson());
     // ignore: use_build_context_synchronously
     _cubit.appealsUpload(requestData, context);
+    isLoadingButton = false;
+    setState(() {});
   }
 
   @override
@@ -589,6 +597,7 @@ class _AppealSendPageState extends State<AppealSendPage> {
                     child: CustomButton(
                       size: _size,
                       context: context,
+                      isLoading: isLoadingButton,
                       text: "Yuborish",
                       callback: _sendingAppeal,
                     ),
