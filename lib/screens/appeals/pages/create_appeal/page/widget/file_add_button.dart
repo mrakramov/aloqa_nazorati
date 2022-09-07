@@ -29,7 +29,7 @@ class FileAddButtonAndCamera extends StatelessWidget {
             height: 60,
             child: OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
-                    backgroundColor: ColorsUtils.buttonColor,
+                    primary: ColorsUtils.buttonColor,
                     side: const BorderSide(color: ColorsUtils.myColor),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10))),
@@ -38,7 +38,7 @@ class FileAddButtonAndCamera extends StatelessWidget {
                 label: Text(
                   text,
                   style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: ColorsUtils.myColor,
+                      color: ColorsUtils.buttonColor,
                       fontSize: 18,
                       fontWeight: FontWeight.w500),
                 )),
