@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:aloqa_nazorati/screens/appeals/data/model/AppealResponse.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_list_responses/single_appeal_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_response_model_for_create_ticket.dart';
@@ -8,6 +10,7 @@ import 'package:aloqa_nazorati/screens/appeals/data/network/http_client_appeal.d
 import 'package:aloqa_nazorati/screens/appeals/domain/appeal_repo.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_send_model.dart';
 import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../../utils/utils.dart';
 
@@ -26,6 +29,7 @@ class _Urls {
     return '${baseUrl}region/$regionId/districts';
   }
 
+  static const downloadImageAndFile = '${baseUrl}get-file/';
   static const uploadFile = "${baseUrl}file-upload";
 }
 
@@ -124,5 +128,33 @@ class AppealRepository extends AppealRepo {
     } catch (e) {
       throw ApiExceptionMapper.toErrorMessage(e);
     }
+  }
+
+  @override
+  Future<bool?> downloadImageAndFiles(
+      {required String? fileName, required String? token}) async {
+    try {
+      var isSaved = false;
+      final dir = await getTemporaryDirectory();
+      final fullPath = '${dir.path}/${fileName!}';
+      final File file = File(fullPath);
+      log("fileeeeeee${file.path}");
+      await _httpClient
+          .downloadFileRequestDio(
+              url: _Urls.downloadImageAndFile + fileName,
+              savedFile: file,
+              name: fileName,
+              token: token)
+          .then((value) => isSaved = true)
+          .onError((error, stackTrace) {
+        log("ERRORR DOWNLOAD$error");
+        return isSaved = false;
+      });
+
+      return isSaved;
+    } catch (e) {
+      log(e);
+    }
+    return null;
   }
 }

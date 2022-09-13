@@ -29,6 +29,25 @@ class SingleAppealCubit extends Cubit<AppealSingleResponseState> {
     }
   }
 
+  void downloadFileToStorage(
+      {required Future<String> token,
+      required String? fileName,
+      String? code}) async {
+    var t = await token;
+    try {
+      emit(LoadingState(true));
+      var data =
+          await repository.downloadImageAndFiles(fileName: fileName, token: t);
+      if (data!) {
+        emit(LoadingState(false));
+        emit(DownloadSatet(isLoaded: data));
+      }
+      singleAppeal(token, code);
+    } catch (e) {
+      emit(ErrorState(e));
+    }
+  }
+
   @override
   void onChange(Change<AppealSingleResponseState> change) {
     log(change);

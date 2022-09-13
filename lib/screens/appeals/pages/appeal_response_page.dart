@@ -163,6 +163,8 @@ class _AppealResponsePageState extends State<AppealResponsePage>
                 if (state is SuccesState) {
                   return GridButtonsForDownloadFileWidget(
                     appeal: state.appeal,
+                    cubit: _cubit,
+                    code: widget.data.code,
                   );
                 }
 
@@ -447,7 +449,13 @@ class _AppealResponsePageState extends State<AppealResponsePage>
 
 class GridButtonsForDownloadFileWidget extends StatelessWidget {
   final SingleAppealResponseModel? appeal;
-  const GridButtonsForDownloadFileWidget({super.key, required this.appeal});
+  final SingleAppealCubit? cubit;
+  final String? code;
+  const GridButtonsForDownloadFileWidget(
+      {super.key,
+      required this.appeal,
+      required this.cubit,
+      required this.code});
 
   @override
   Widget build(BuildContext context) {
@@ -470,7 +478,12 @@ class GridButtonsForDownloadFileWidget extends StatelessWidget {
                     color: ColorsUtils.myColor,
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 10)),
-              onPressed: () {},
+              onPressed: () async {
+                cubit!.downloadFileToStorage(
+                    token: Prefs.load('token'),
+                    fileName: file.fileName,
+                    code: code);
+              },
               child: Text(
                 file.fileName!,
                 overflow: TextOverflow.ellipsis,

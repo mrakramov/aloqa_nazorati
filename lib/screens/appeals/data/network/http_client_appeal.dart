@@ -152,4 +152,38 @@ class HttpClientAppeal {
       throw ConnectionException();
     }
   }
+
+  Future<dynamic> downloadFileRequestDio(
+      {required String? url,
+      required File? savedFile,
+      required String? name,
+      required String? token}) async {
+    Response response;
+
+    try {
+      log("---------------------$url");
+      response = await _dio.downloadUri(
+        Uri.tryParse(url!)!,
+        savedFile!.path,
+        options: Options(headers: {"Authorization": "Bearer $token"}),
+        onReceiveProgress: (count, total) => log('${(count / total) * 100}%'),
+      );
+
+      final statusCode = response.statusCode;
+      if (statusCode! >= 200 && statusCode < 299) {
+        // await FileManagementService.writeFile(
+        //     response.data.readAsBytesSync(), name!)
+        log("Dataaaaaa ${response.data}");
+        return response.data;
+      } else if (statusCode >= 400 && statusCode < 500) {
+        throw ClientErrorException();
+      } else if (statusCode >= 500 && statusCode < 600) {
+        throw ServerErrorException();
+      } else {
+        throw UnknownException();
+      }
+    } on SocketException {
+      throw ConnectionException();
+    }
+  }
 }

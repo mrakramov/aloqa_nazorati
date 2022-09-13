@@ -14,6 +14,11 @@ class SuccesState extends AppealSingleResponseState {
   SuccesState(this.appeal);
 }
 
+class DownloadSatet extends AppealSingleResponseState {
+  bool? isLoaded;
+  DownloadSatet({required this.isLoaded});
+}
+
 class ErrorState extends AppealSingleResponseState {
   Object? error;
   ErrorState(this.error);

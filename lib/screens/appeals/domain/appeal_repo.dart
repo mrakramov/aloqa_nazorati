@@ -12,6 +12,8 @@ abstract class AppealRepo {
       {required AppealRequestData model, required String token});
   Future<List<RegionsResponse>> getRegions();
   Future<List<DistrictsResponse>> getDistricts(int? regionId);
+  Future<bool?> downloadImageAndFiles(
+      {required String? fileName, required String? token});
   Future<FileUploadResponseModel> uploadFile(
       {required String? file, required String? token});
   Future<SingleAppealResponseModel> getSingleAppeal(

@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:downloads_path_provider_28/downloads_path_provider_28.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void log(Object? msg) {
@@ -60,6 +64,28 @@ class NumberUtil {
       newNum += s[i];
     }
     return newNum;
+  }
+}
+
+class FileManagementService {
+  static Future<File> writeFile(Uint8List data, String name) async {
+    // storage permission ask
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      await Permission.storage.request();
+    }
+    // the downloads folder path
+    Directory? tempDir = await DownloadsPathProvider.downloadsDirectory;
+    String tempPath = tempDir!.path;
+    var filePath = '$tempPath/$name';
+    //
+
+    // the data
+    var bytes = ByteData.view(data.buffer);
+    final buffer = bytes.buffer;
+    // save the data in the path
+    return File(filePath).writeAsBytes(
+        buffer.asUint8List(data.offsetInBytes, data.lengthInBytes));
   }
 }
 
