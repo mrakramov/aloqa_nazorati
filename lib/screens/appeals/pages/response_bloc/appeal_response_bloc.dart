@@ -36,11 +36,12 @@ class SingleAppealCubit extends Cubit<AppealSingleResponseState> {
     var t = await token;
     try {
       emit(LoadingState(true));
-      var data =
-          await repository.downloadImageAndFiles(fileName: fileName, token: t);
-      if (data!) {
+      var data = await repository.downloadFileUsingDownloader(
+          fileName: fileName, token: t);
+      log(data);
+      if (data != null) {
         emit(LoadingState(false));
-        emit(DownloadSatet(isLoaded: data));
+        emit(DownloadState(taskId: data));
       }
       singleAppeal(token, code);
     } catch (e) {

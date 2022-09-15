@@ -157,4 +157,50 @@ class AppealRepository extends AppealRepo {
     }
     return null;
   }
+
+  @override
+  Future<String?> downloadFile(
+      {required String? fileName, required String? token}) async {
+    var pathFile = '';
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      final fullPath = '${dir.path}/${fileName!}';
+      final File file = File(fullPath);
+      log("fileeeeeee${file.path}");
+      pathFile = await _httpClient.downloadFile(
+          url: _Urls.downloadImageAndFile,
+          fileName: fileName,
+          dir: file.path,
+          token: token!);
+
+      return pathFile;
+    } catch (e) {
+      log(e);
+    }
+    return null;
+  }
+
+  @override
+  Future<String?> downloadFileUsingDownloader(
+      {required String? fileName, required String? token}) async {
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      if (!dir.existsSync()) {
+        log('Directory toplmadi');
+        return null;
+      }
+      final fullPath = '${dir.path}/${fileName!}';
+      final File file = File(fullPath);
+      log("fileeeeeee${file.path}");
+      final taskId = await _httpClient.downloadFileUsingFlutterDownloader(
+          url: _Urls.downloadImageAndFile + fileName,
+          savedFile: file,
+          name: fileName,
+          token: token);
+      return taskId;
+    } catch (e) {
+      log(e);
+    }
+    return null;
+  }
 }

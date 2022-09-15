@@ -18,4 +18,9 @@ abstract class AppealRepo {
       {required String? file, required String? token});
   Future<SingleAppealResponseModel> getSingleAppeal(
       {required String? token, required String? code});
+  Future<String?> downloadFile(
+      {required String? fileName, required String? token});
+
+  Future<String?> downloadFileUsingDownloader(
+      {required String? fileName, required String? token});
 }

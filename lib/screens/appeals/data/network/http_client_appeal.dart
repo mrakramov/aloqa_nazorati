@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../../utils/utils.dart';
@@ -150,6 +151,73 @@ class HttpClientAppeal {
       }
     } on SocketException {
       throw ConnectionException();
+    }
+  }
+
+  Future<String> downloadFile(
+      {required String url,
+      required String fileName,
+      required String dir,
+      required String? token}) async {
+    HttpClient httpClient = HttpClient();
+    File file;
+    String filePath = '';
+    String myUrl = '';
+
+    try {
+      myUrl = '$url/$fileName';
+      var request = await httpClient.getUrl(Uri.parse(myUrl));
+      request.headers.add("Authorization", "Bearer $token");
+      var response = await request.close();
+      if (response.statusCode == 200) {
+        var bytes = await consolidateHttpClientResponseBytes(response);
+        filePath = '$dir/$fileName';
+        file = File(filePath);
+        await file.writeAsBytes(bytes);
+        log(file.path);
+      } else {
+        filePath = 'Error code: ${response.statusCode}';
+      }
+    } catch (ex) {
+      filePath = 'Can not fetch url';
+    }
+
+    return filePath;
+  }
+
+  Future<dynamic> downloadFileUsingFlutterDownloader(
+      {required String? url,
+      required File? savedFile,
+      required String? name,
+      required String? token}) async {
+    try {
+      final savedDir = Directory(savedFile!.path);
+      late String? taskId;
+      await savedDir.create().then((value) async {
+        taskId = await FlutterDownloader.enqueue(
+          url: url!,
+          headers: {
+            "Authorization": "Bearer $token"
+          }, // optional: header send with url (auth token etc)
+          savedDir: savedFile.path,
+          showNotification:
+              true, // show download progress in status bar (for Android)
+          openFileFromNotification:
+              true, // click on notification to open downloaded file (for Android)
+        );
+      });
+      _openDownloadedFile(taskId);
+      return taskId;
+    } catch (e) {
+      log(e);
+    }
+  }
+
+  Future<bool> _openDownloadedFile(String? task) {
+    if (task != null) {
+      return FlutterDownloader.open(taskId: task);
+    } else {
+      return Future.value(false);
     }
   }
 

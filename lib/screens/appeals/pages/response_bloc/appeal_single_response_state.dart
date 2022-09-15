@@ -14,9 +14,9 @@ class SuccesState extends AppealSingleResponseState {
   SuccesState(this.appeal);
 }
 
-class DownloadSatet extends AppealSingleResponseState {
-  bool? isLoaded;
-  DownloadSatet({required this.isLoaded});
+class DownloadState extends AppealSingleResponseState {
+  String? taskId;
+  DownloadState({required this.taskId});
 }
 
 class ErrorState extends AppealSingleResponseState {

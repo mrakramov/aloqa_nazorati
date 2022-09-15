@@ -1,3 +1,7 @@
+import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
+
 import 'package:aloqa_nazorati/screens/appeals/data/model/AppealResponse.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_list_responses/single_appeal_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/network/appeal_repository.dart';
@@ -6,6 +10,8 @@ import 'package:aloqa_nazorati/screens/appeals/pages/response_bloc/appeal_single
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../utils/utils.dart';
 
@@ -23,12 +29,121 @@ class _AppealResponsePageState extends State<AppealResponsePage>
   int selectedIndex = 0;
   late TabController _tabController;
   final SingleAppealCubit _cubit = SingleAppealCubit(AppealRepository());
+  final ReceivePort _port = ReceivePort();
   @override
   void initState() {
     super.initState();
     _tabController = TabController(initialIndex: 0, length: 3, vsync: this);
     _cubit.singleAppeal(Prefs.load('token'), widget.data.code);
+
+    IsolateNameServer.registerPortWithName(
+        _port.sendPort, 'downloader_send_port');
+    _port.listen((dynamic data) {
+      String id = data[0];
+      DownloadTaskStatus status = data[1];
+      int progress = data[2];
+      setState(() {});
+    });
+
+    FlutterDownloader.registerCallback(downloadCallback);
   }
+
+  Future<bool> _openDownloadedFile(String? taskId) {
+    if (taskId != null) {
+      return FlutterDownloader.open(taskId: taskId);
+    } else {
+      return Future.value(false);
+    }
+  }
+
+  Future<void> requestDownload(
+      {required String? url,
+      required String? name,
+      required Future<String>? token}) async {
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      var localPath = dir.path;
+      var savedDir = Directory(localPath);
+      final t = await token;
+      log('TTTT $t');
+      await savedDir.create().then((value) async {
+        String? taskId = await FlutterDownloader.enqueue(
+            url: url!,
+            savedDir: localPath,
+            headers: {"Authorization": "Bearer $t"},
+            fileName: name,
+            showNotification: true,
+            openFileFromNotification: true);
+        downloadCallback(taskId!, DownloadTaskStatus.running, 0);
+        _openDownloadedFile(taskId);
+      });
+    } catch (e) {
+      log(e);
+    }
+  }
+
+  @override
+  void dispose() {
+    IsolateNameServer.removePortNameMapping('downloader_send_port');
+    super.dispose();
+  }
+
+  @pragma('vm:entry-point')
+  static void downloadCallback(
+      String id, DownloadTaskStatus status, int progress) {
+    final SendPort send =
+        IsolateNameServer.lookupPortByName('downloader_send_port')!;
+    send.send([id, status, progress]);
+  }
+  // Future<String?> downloadFileUsingDownloader(
+  //     {required String? fileName, required String? token}) async {
+  //   try {
+  //     final dir = await getApplicationDocumentsDirectory();
+  //     if (!dir.existsSync()) {
+  //       log('Directory toplmadi');
+  //       return null;
+  //     }
+  //     final fullPath = '${dir.path}/${fileName!}';
+  //     final File file = File(fullPath);
+  //     log("fileeeeeee${file.path}");
+  //     final taskId = await downloadFileUsingFlutterDownloader(
+  //         url: 'https://xn.technocorp.uz/api/get-file/$fileName',
+  //         savedFile: file,
+  //         name: fileName,
+  //         token: token);
+  //     return taskId;
+  //   } catch (e) {
+  //     log(e);
+  //   }
+  //   return null;
+  // }
+
+  // Future<dynamic> downloadFileUsingFlutterDownloader(
+  //     {required String? url,
+  //     required File? savedFile,
+  //     required String? name,
+  //     required String? token}) async {
+  //   try {
+  //     final savedDir = Directory(savedFile!.path);
+  //     late String? taskId;
+  //     await savedDir.create().then((value) async {
+  //       taskId = await FlutterDownloader.enqueue(
+  //         url: url!,
+  //         headers: {
+  //           "Authorization": "Bearer $token"
+  //         }, // optional: header send with url (auth token etc)
+  //         savedDir: savedFile.path,
+  //         showNotification:
+  //             true, // show download progress in status bar (for Android)
+  //         openFileFromNotification:
+  //             true, // click on notification to open downloaded file (for Android)
+  //       );
+  //     });
+  //     return taskId;
+  //   } catch (e) {
+  //     log(e);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -165,6 +280,7 @@ class _AppealResponsePageState extends State<AppealResponsePage>
                     appeal: state.appeal,
                     cubit: _cubit,
                     code: widget.data.code,
+                    requestDownload: requestDownload,
                   );
                 }
 
@@ -447,14 +563,21 @@ class _AppealResponsePageState extends State<AppealResponsePage>
   }
 }
 
+typedef FutureFuncValueChanged = Future<void> Function(
+    {required String url,
+    required String name,
+    required Future<String>? token});
+
 class GridButtonsForDownloadFileWidget extends StatelessWidget {
   final SingleAppealResponseModel? appeal;
   final SingleAppealCubit? cubit;
   final String? code;
+  final FutureFuncValueChanged requestDownload;
   const GridButtonsForDownloadFileWidget(
       {super.key,
       required this.appeal,
       required this.cubit,
+      required this.requestDownload,
       required this.code});
 
   @override
@@ -479,10 +602,15 @@ class GridButtonsForDownloadFileWidget extends StatelessWidget {
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 10)),
               onPressed: () async {
-                cubit!.downloadFileToStorage(
-                    token: Prefs.load('token'),
-                    fileName: file.fileName,
-                    code: code);
+                // cubit!.downloadFileToStorage(
+                //     token: Prefs.load('token'),
+                //     fileName: file.fileName,
+                //     code: code);
+                await requestDownload(
+                    url:
+                        'https://xn.technocorp.uz/api/get-file/${file.fileName}',
+                    name: file.fileName!,
+                    token: Prefs.load('token'));
               },
               child: Text(
                 file.fileName!,
