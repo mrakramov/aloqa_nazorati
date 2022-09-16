@@ -43,6 +43,7 @@ class _AppealResponsePageState extends State<AppealResponsePage>
       DownloadTaskStatus status = data[1];
       int progress = data[2];
       setState(() {});
+      _openDownloadedFile(id);
     });
 
     FlutterDownloader.registerCallback(downloadCallback);
@@ -75,7 +76,6 @@ class _AppealResponsePageState extends State<AppealResponsePage>
             showNotification: true,
             openFileFromNotification: true);
         downloadCallback(taskId!, DownloadTaskStatus.running, 0);
-        _openDownloadedFile(taskId);
       });
     } catch (e) {
       log(e);
@@ -95,55 +95,6 @@ class _AppealResponsePageState extends State<AppealResponsePage>
         IsolateNameServer.lookupPortByName('downloader_send_port')!;
     send.send([id, status, progress]);
   }
-  // Future<String?> downloadFileUsingDownloader(
-  //     {required String? fileName, required String? token}) async {
-  //   try {
-  //     final dir = await getApplicationDocumentsDirectory();
-  //     if (!dir.existsSync()) {
-  //       log('Directory toplmadi');
-  //       return null;
-  //     }
-  //     final fullPath = '${dir.path}/${fileName!}';
-  //     final File file = File(fullPath);
-  //     log("fileeeeeee${file.path}");
-  //     final taskId = await downloadFileUsingFlutterDownloader(
-  //         url: 'https://xn.technocorp.uz/api/get-file/$fileName',
-  //         savedFile: file,
-  //         name: fileName,
-  //         token: token);
-  //     return taskId;
-  //   } catch (e) {
-  //     log(e);
-  //   }
-  //   return null;
-  // }
-
-  // Future<dynamic> downloadFileUsingFlutterDownloader(
-  //     {required String? url,
-  //     required File? savedFile,
-  //     required String? name,
-  //     required String? token}) async {
-  //   try {
-  //     final savedDir = Directory(savedFile!.path);
-  //     late String? taskId;
-  //     await savedDir.create().then((value) async {
-  //       taskId = await FlutterDownloader.enqueue(
-  //         url: url!,
-  //         headers: {
-  //           "Authorization": "Bearer $token"
-  //         }, // optional: header send with url (auth token etc)
-  //         savedDir: savedFile.path,
-  //         showNotification:
-  //             true, // show download progress in status bar (for Android)
-  //         openFileFromNotification:
-  //             true, // click on notification to open downloaded file (for Android)
-  //       );
-  //     });
-  //     return taskId;
-  //   } catch (e) {
-  //     log(e);
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
