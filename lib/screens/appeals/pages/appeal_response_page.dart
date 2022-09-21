@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../utils/utils.dart';
 
@@ -42,6 +43,7 @@ class _AppealResponsePageState extends State<AppealResponsePage>
       String id = data[0];
       DownloadTaskStatus status = data[1];
       int progress = data[2];
+      log(data);
       setState(() {});
       _openDownloadedFile(id);
     });
@@ -62,21 +64,24 @@ class _AppealResponsePageState extends State<AppealResponsePage>
       required String? name,
       required Future<String>? token}) async {
     try {
-      final dir = await getApplicationDocumentsDirectory();
-      var localPath = dir.path;
-      var savedDir = Directory(localPath);
-      final t = await token;
-      log('TTTT $t');
-      await savedDir.create().then((value) async {
-        String? taskId = await FlutterDownloader.enqueue(
-            url: url!,
-            savedDir: localPath,
-            headers: {"Authorization": "Bearer $t"},
-            fileName: name,
-            showNotification: true,
-            openFileFromNotification: true);
-        downloadCallback(taskId!, DownloadTaskStatus.running, 0);
-      });
+      final requestToStorage = await Permission.storage.request();
+      if (requestToStorage.isGranted) {
+        final dir = await getExternalStorageDirectory();
+        var localPath = dir!.path;
+        var savedDir = Directory(localPath);
+        final t = await token;
+        log('TTTT $t');
+        await savedDir.create().then((value) async {
+          String? taskId = await FlutterDownloader.enqueue(
+              url: url!,
+              savedDir: localPath,
+              headers: {"Authorization": "Bearer $t"},
+              fileName: name,
+              showNotification: true,
+              openFileFromNotification: true);
+          downloadCallback(taskId!, DownloadTaskStatus.running, 0);
+        });
+      }
     } catch (e) {
       log(e);
     }

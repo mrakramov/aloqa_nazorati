@@ -13,9 +13,6 @@ get setup async {
   await serviceLocator.get<HiveDB>().hiveInit();
   await RegionsData.writeDataToDb();
   await FlutterDownloader.initialize(
-      debug:
-          true, // optional: set to false to disable printing logs to console (default: true)
-      ignoreSsl:
-          true // option: set to false to disable working with http links (default: false)
-      );
+    debug: true,
+  );
 }
