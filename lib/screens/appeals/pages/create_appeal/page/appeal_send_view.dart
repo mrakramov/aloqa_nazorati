@@ -4,6 +4,7 @@ Created by Axmadjon Isaqov on 22:08:06 04.08.2022
 */
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_send_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/districts_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/regions_response_model.dart';
@@ -136,7 +137,8 @@ class _AppealSendPageState extends State<AppealSendPage> {
       }
       _isLoading = true;
       setState(() {});
-      await _cubit.uploadFile(filePath: fileImage.path).then((value) {
+      final File file = File(fileImage.path);
+      await _cubit.uploadFile(file: file).then((value) {
         _isLoading = false;
         ToastFlutter.showToast('Rasm saqlandi');
         setState(() {});
@@ -226,13 +228,14 @@ class _AppealSendPageState extends State<AppealSendPage> {
     }
     _isLoading = true;
     setState(() {});
-    await _cubit.uploadFile(filePath: result.files.first.path).then((value) {
+    final File file = File(result.files.first.path!);
+    await _cubit.uploadFile(file: file).then((value) {
       _isLoading = false;
       ToastFlutter.showToast('Rasm saqlandi');
-      setState(() {});
     }).onError((error, stackTrace) {
       ToastFlutter.showToast('Xatolik sodir bo\'ldi');
     });
+
     if (kDebugMode) {
       print(result.files.first.path);
       print(result.count);

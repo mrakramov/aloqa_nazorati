@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:aloqa_nazorati/screens/appeals/data/model/response_file_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/network/appeal_repository.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_send_model.dart';
@@ -95,12 +97,11 @@ class AppealSendCubit extends Cubit<AppealSendState> {
     }
   }
 
-  Future<void> uploadFile({required String? filePath}) async {
+  Future<void> uploadFile({required File? file}) async {
     try {
       emit(LoadingState(true));
       var token = await Prefs.load("token");
-      final response =
-          await repository.uploadFile(token: token, file: filePath);
+      final response = await repository.uploadFile(token: token, file: file);
       _listFile.add(response);
       if (kDebugMode) {
         print("IDDDD------>${response.data!.id!}");

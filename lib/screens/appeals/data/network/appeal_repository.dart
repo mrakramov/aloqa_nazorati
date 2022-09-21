@@ -102,10 +102,10 @@ class AppealRepository extends AppealRepo {
 
   @override
   Future<FileUploadResponseModel> uploadFile(
-      {required String? file, required String? token}) async {
+      {required File? file, required String? token}) async {
     try {
       var response = await _httpClient.fileUploadPostResponse(
-          url: _Urls.uploadFile, path: file, token: token);
+          url: _Urls.uploadFile, file: file, token: token);
       if (kDebugMode) {
         print(response);
       }

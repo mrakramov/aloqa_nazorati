@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:aloqa_nazorati/screens/appeals/data/model/AppealResponse.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_list_responses/single_appeal_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_response_model_for_create_ticket.dart';
@@ -15,7 +17,7 @@ abstract class AppealRepo {
   Future<bool?> downloadImageAndFiles(
       {required String? fileName, required String? token});
   Future<FileUploadResponseModel> uploadFile(
-      {required String? file, required String? token});
+      {required File? file, required String? token});
   Future<SingleAppealResponseModel> getSingleAppeal(
       {required String? token, required String? code});
   Future<String?> downloadFile(

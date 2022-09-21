@@ -88,23 +88,33 @@ class HttpClientAppeal {
     }
   }
 
-  ///file upload post response
+// Future<String> uploadImage(File file) async {
+//     String fileName = file.path.split('/').last;
+//     FormData formData = FormData.fromMap({
+//         "file":
+//             await MultipartFile.fromFile(file.path, filename:fileName),
+//     });
+//     response = await dio.post("/info", data: formData);
+//     return response.data['id'];
+// }
+
   Future<dynamic> fileUploadPostResponse(
       {required String? url,
       required String? token,
-      required String? path}) async {
-    http.StreamedResponse response;
+      required File? file}) async {
+    final Dio dio = Dio(BaseOptions(headers: {
+      "mobile-app-key": Strings.webApiKey,
+      "Authorization": "Bearer $token"
+    }, connectTimeout: 5000, receiveTimeout: 5000));
+    String fileName = file!.path.split('/').last;
     try {
-      var request = http.MultipartRequest("POST", Uri.tryParse(url!)!);
-      request.headers.addAll({
-        "mobile-app-key": Strings.webApiKey,
-        "Authorization": "Bearer $token"
+      FormData formData = FormData.fromMap({
+        "file": await MultipartFile.fromFile(file.path, filename: fileName),
       });
-      request.files.add(await http.MultipartFile.fromPath('file', path!));
-      response = await request.send();
+      var response = await dio.postUri(Uri.tryParse(url!)!, data: formData);
       final statusCode = response.statusCode;
-      if (statusCode >= 200 && statusCode < 299) {
-        final responseString = await response.stream.bytesToString();
+      if (statusCode! >= 200 && statusCode < 299) {
+        final responseString = await response.data;
         if (responseString.isEmpty) {
           return <dynamic>[];
         } else {
@@ -121,6 +131,40 @@ class HttpClientAppeal {
       throw ConnectionException();
     }
   }
+
+  ///file upload post response
+  // Future<dynamic> fileUploadPostResponse(
+  //     {required String? url,
+  //     required String? token,
+  //     required String? path}) async {
+  //   http.StreamedResponse response;
+  //   try {
+  //     var request = http.MultipartRequest("POST", Uri.tryParse(url!)!);
+  //     request.headers.addAll({
+  //       "mobile-app-key": Strings.webApiKey,
+  //       "Authorization": "Bearer $token"
+  //     });
+  //     request.files.add(await http.MultipartFile.fromPath('file', path!));
+  //     response = await request.send();
+  //     final statusCode = response.statusCode;
+  //     if (statusCode >= 200 && statusCode < 299) {
+  //       final responseString = await response.stream.bytesToString();
+  //       if (responseString.isEmpty) {
+  //         return <dynamic>[];
+  //       } else {
+  //         return jsonDecode(responseString);
+  //       }
+  //     } else if (statusCode >= 400 && statusCode < 500) {
+  //       throw ClientErrorException();
+  //     } else if (statusCode >= 500 && statusCode < 600) {
+  //       throw ServerErrorException();
+  //     } else {
+  //       throw UnknownException();
+  //     }
+  //   } on SocketException {
+  //     throw ConnectionException();
+  //   }
+  // }
 
   ///post request using dio
   Future<dynamic> postRequestDio(

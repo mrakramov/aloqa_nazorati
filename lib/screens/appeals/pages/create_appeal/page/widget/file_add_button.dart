@@ -29,7 +29,7 @@ class FileAddButtonAndCamera extends StatelessWidget {
             height: 60,
             child: OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
-                    primary: ColorsUtils.buttonColor,
+                    foregroundColor: ColorsUtils.buttonColor,
                     side: const BorderSide(color: ColorsUtils.myColor),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10))),
