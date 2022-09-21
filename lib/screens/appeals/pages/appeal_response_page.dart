@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
-
 import 'package:aloqa_nazorati/screens/appeals/data/model/AppealResponse.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/model/appeal_list_responses/single_appeal_response_model.dart';
 import 'package:aloqa_nazorati/screens/appeals/data/network/appeal_repository.dart';
@@ -68,7 +67,9 @@ class _AppealResponsePageState extends State<AppealResponsePage>
     try {
       final requestToStorage = await Permission.storage.request();
       if (requestToStorage.isGranted) {
-        final dir = await getExternalStorageDirectory();
+        final dir = Platform.isAndroid
+            ? await getExternalStorageDirectory()
+            : await getApplicationDocumentsDirectory();
         var localPath = dir!.path;
         var savedDir = Directory(localPath);
         final t = await token;
