@@ -45,7 +45,9 @@ class _AppealResponsePageState extends State<AppealResponsePage>
       int progress = data[2];
       log(data);
       setState(() {});
-      _openDownloadedFile(id);
+      if (status == DownloadTaskStatus.complete) {
+        _openDownloadedFile(id);
+      }
     });
 
     FlutterDownloader.registerCallback(downloadCallback);
@@ -562,9 +564,10 @@ class GridButtonsForDownloadFileWidget extends StatelessWidget {
                 //     token: Prefs.load('token'),
                 //     fileName: file.fileName,
                 //     code: code);
+
                 await requestDownload(
                     url:
-                        'https://xn.technocorp.uz/api/get-file/${file.fileName}',
+                        'https://xn.technocorp.uz/storage/${file.filePath}/${file.fileName}',
                     name: file.fileName!,
                     token: Prefs.load('token'));
               },
