@@ -68,9 +68,9 @@ class _AppealSendPageState extends State<AppealSendPage> {
     zoom: 14.4746,
   );
 
-  final _mapMarkerSC = StreamController<List<Marker>>.broadcast();
+  final _mapMarkerSC = StreamController<Marker>.broadcast();
 
-  StreamSink<List<Marker>> get _mapMarkerSink => _mapMarkerSC.sink;
+  StreamSink<Marker> get _mapMarkerSink => _mapMarkerSC.sink;
 
   final List<Marker> _markerList = [];
   @override
@@ -161,7 +161,7 @@ class _AppealSendPageState extends State<AppealSendPage> {
             SizedBox(
                 height: _size!.height * 0.5,
                 width: _size!.width,
-                child: StreamBuilder<List<Marker>>(
+                child: StreamBuilder<Marker>(
                     stream: _mapMarkerSC.stream,
                     builder: (context, snapshot) {
                       return GoogleMap(
@@ -173,8 +173,9 @@ class _AppealSendPageState extends State<AppealSendPage> {
                                   "${argument.longitude}+${argument.longitude}"),
                               position: LatLng(
                                   argument.latitude, argument.longitude));
+                          _markerList.clear();
                           _markerList.add(marker);
-                          _mapMarkerSink.add(_markerList);
+                          _mapMarkerSink.add(_markerList.last);
                           setState(() {});
                         },
                         initialCameraPosition: _kGooglePlex,
