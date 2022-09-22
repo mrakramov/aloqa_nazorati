@@ -55,7 +55,6 @@ class _AppealSendPageState extends State<AppealSendPage> {
   late DistrictsResponse? selectedDistrict;
   bool? districtSelected = false;
   bool? regionSelected = false;
-  bool? _isLoading = false;
   bool? isLoadingButton = false;
   String? hintText = 'Viloyatni tanlang';
   String? hintTextDistrict = "Tumanni tanlang";
@@ -135,13 +134,11 @@ class _AppealSendPageState extends State<AppealSendPage> {
       if (fileImage == null) {
         return;
       }
-      _isLoading = true;
       setState(() {});
       final File file = File(fileImage.path);
       await _cubit.uploadFile(file: file).then((value) {
-        _isLoading = false;
-        ToastFlutter.showToast('Rasm saqlandi');
         setState(() {});
+        ToastFlutter.showToast('Rasm saqlandi');
       }).onError((error, stackTrace) {
         ToastFlutter.showToast('Xatolik sodir bo\'ldi');
       });
@@ -226,11 +223,9 @@ class _AppealSendPageState extends State<AppealSendPage> {
     if (result == null) {
       return;
     }
-    _isLoading = true;
     setState(() {});
     final File file = File(result.files.first.path!);
     await _cubit.uploadFile(file: file).then((value) {
-      _isLoading = false;
       ToastFlutter.showToast('Rasm saqlandi');
     }).onError((error, stackTrace) {
       ToastFlutter.showToast('Xatolik sodir bo\'ldi');
@@ -613,26 +608,33 @@ class _AppealSendPageState extends State<AppealSendPage> {
               ),
             );
           }),
-          if (_isLoading!)
-            Container(
-              height: _size!.height,
-              width: _size!.width,
-              color: Colors.grey.withOpacity(0.7),
-              child: const Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Card(
-                    elevation: .0,
-                    margin: EdgeInsets.zero,
-                    child: ListTile(
-                      tileColor: Colors.white,
-                      leading: CircularProgressIndicator(),
-                      title: Text('Yuklanmoqda'),
+          BlocBuilder(
+              bloc: _cubit,
+              builder: (context, state) {
+                if (state is LoadingState) {
+                  return Container(
+                    height: _size!.height,
+                    width: _size!.width,
+                    color: Colors.grey.withOpacity(0.7),
+                    child: const Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Card(
+                          elevation: .0,
+                          margin: EdgeInsets.zero,
+                          child: ListTile(
+                            tileColor: Colors.white,
+                            leading: CircularProgressIndicator(),
+                            title: Text('Yuklanmoqda'),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            )
+                  );
+                }
+
+                return const SizedBox();
+              })
         ],
       ),
     );

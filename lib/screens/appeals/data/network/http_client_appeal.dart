@@ -112,13 +112,15 @@ class HttpClientAppeal {
         "file": await MultipartFile.fromFile(file.path, filename: fileName),
       });
       var response = await dio.postUri(Uri.tryParse(url!)!, data: formData);
+      log("RESPONSEEE+$response");
+      log(response.statusCode);
       final statusCode = response.statusCode;
       if (statusCode! >= 200 && statusCode < 299) {
         final responseString = await response.data;
         if (responseString.isEmpty) {
           return <dynamic>[];
         } else {
-          return jsonDecode(responseString);
+          return responseString;
         }
       } else if (statusCode >= 400 && statusCode < 500) {
         throw ClientErrorException();
